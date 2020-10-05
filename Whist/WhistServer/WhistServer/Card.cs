@@ -2,17 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
+
+public enum CardEnum { diamond, heart, spade, club };
 namespace WhistServer
 {
     [Serializable]
     public class Card
     {
+        public static int CARD_LENGTH_BYTES = 8;
         private int num;
-        private string shape;
+        private CardEnum shape;
 
-        public Card(int num, string shape)
+        public Card(int num, CardEnum shape)
         {
             this.num = num;
             this.shape = shape;
@@ -31,7 +35,7 @@ namespace WhistServer
             return this.num;
         }
 
-        public string GetShape()
+        public CardEnum GetShape()
         {
             return this.shape;
         }
@@ -41,17 +45,52 @@ namespace WhistServer
             this.num = num;
         }
 
-        public void SetShape(string shape)
+        public void SetShape(CardEnum shape)
         {
             this.shape = shape;
         }
 
         public override string ToString()
         {
-            return this.num + " - " + this.shape;
+            return this.num + " - " + getCardName();
         }
-      
+        public string getCardName()
+        {
+            if (shape == CardEnum.diamond)
+                return "Diamond";
+            else if (shape == CardEnum.club)
+                return "Club";
+            else if (shape == CardEnum.spade)
+                return "Spade";
+            return "Heart";
 
+        }
+
+
+        public static Card[] DesserializeArr(byte[] data)
+        {
+            /*
+             Card = 8 Bytes
+
+
+            [1,2,1,1,2,1,2,1,2]
+            */
+
+            int lengthOfArr = data.Length / CARD_LENGTH_BYTES;
+            Card[] resultArr = new Card[lengthOfArr];
+            for (int i = 0; i < lengthOfArr; i++)
+            {
+                resultArr[i] = Card.Desserialize(data);
+                if (i != lengthOfArr - 1)
+                {
+                    for (int j = 0; j < CARD_LENGTH_BYTES; j++)
+                    {
+                        data[j] = data[j + CARD_LENGTH_BYTES];
+                    }
+                }
+            }
+            return resultArr;
+        }
         public static Card Desserialize(byte[] data)
         {
             Card result = new Card();
@@ -60,15 +99,12 @@ namespace WhistServer
                 using (BinaryReader reader = new BinaryReader(m))
                 {
                     result.num = reader.ReadInt32();
-                    result.shape = reader.ReadString();
+                    result.shape = (CardEnum)reader.ReadInt32();
                 }
             }
             return result;
         }
 
-        //public static Card[] DesserializeArr(byte[] data)
-        //{
-            
-        //}
+
     }
 }

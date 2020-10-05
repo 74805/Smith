@@ -18,7 +18,7 @@ namespace WhistCilent
     {
         private TcpClient client;
         private NetworkStream stream;
-        private List<Card> cards;
+        private List<Card> hand;
         public WhistClient()
         {
             FormBorderStyle = FormBorderStyle.None;
@@ -27,17 +27,28 @@ namespace WhistCilent
             client = new TcpClient("localhost", 7986);
             stream = client.GetStream();
 
-            byte[] data = Encoding.UTF8.GetBytes(Environment.UserName);
-            stream.Write(data, 0, data.Length);
+            byte[] data = Encoding.UTF8.GetBytes(Environment.UserName); //save the user name string in bytes array
+            stream.Write(data, 0, data.Length); //send the data array
+            byte[] data1 = new byte[256]; 
+            stream.Read(data1, 0, data1.Length); //recive the cards from the server
 
-            cards = new List<Card>();
-
-            byte[] data1 = new byte[256];
-            stream.Read(data1, 0, data1.Length);
-
-            Card[] temp = Card.DesserializeArr(data1);
+            Card[] temp = Card.DesserializeArr(data1); //parse the cards that has been recived
+            hand = temp.ToList(); //create List of Cards from the Card array
+            for(int i = 0; i < temp.Length; i++)
+            {
+                Console.WriteLine(temp.ToString() + " ");
+            }
 
            // cards = temp.ToList();
+        }
+        public static byte[] ObjectToByteArray(Object obj)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            using (var ms = new MemoryStream())
+            {
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
+            }
         }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {

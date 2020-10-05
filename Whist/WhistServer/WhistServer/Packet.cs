@@ -14,10 +14,10 @@ namespace WhistServer
 
             for (int i = 0; i < 13; i++)
             {
-                this.cards[i] = (new Card(i, "Spades"));
-                this.cards[i + 13] = (new Card(i, "Hearts"));
-                this.cards[i + 26] = (new Card(i, "Diamonds"));
-                this.cards[i + 39] = (new Card(i, "Clubs"));
+                this.cards[i] = (new Card(i, CardEnum.heart));
+                this.cards[i + 13] = (new Card(i, CardEnum.spade));
+                this.cards[i + 26] = (new Card(i, CardEnum.diamond));
+                this.cards[i + 39] = (new Card(i, CardEnum.club));
             }
         }
         public Card[] GetCards()
