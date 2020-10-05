@@ -55,11 +55,19 @@ namespace WhistServer
             //sorting the cards the players
 
             int[,] shapeamount = new int[4,3];
+            
             for (int i = 0; i < 4; i++)
             {
-                for (int j = 0; j < 13; j++) 
+                for (int j = 0; j < 13; j++)
                 {
-                    
+                    try
+                    {
+                        shapeamount[i, (int)pcards[i][j].GetShape()]++;
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
 
