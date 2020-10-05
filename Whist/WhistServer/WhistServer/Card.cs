@@ -5,8 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
-
-public enum CardEnum { diamond, heart, spade, club };
+public enum CardEnum: byte { spade, heart, club ,diamond};
 namespace WhistServer
 {
     [Serializable]
@@ -107,7 +106,7 @@ namespace WhistServer
                 resultArr[i] = Card.Desserialize(data);
                 if (i != lengthOfArr - 1)
                 {
-                    for (int j = 0; j < CARD_LENGTH_BYTES; j++)
+                    for (int j = 0; j <data.Length - CARD_LENGTH_BYTES; j++)
                     {
                         data[j] = data[j + CARD_LENGTH_BYTES];
                     }

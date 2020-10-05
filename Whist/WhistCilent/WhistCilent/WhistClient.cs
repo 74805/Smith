@@ -19,10 +19,11 @@ namespace WhistCilent
         private TcpClient client;
         private NetworkStream stream;
         private List<Card> hand;
+        private List<Label> visHand;
         public WhistClient()
         {
-            FormBorderStyle = FormBorderStyle.None;
-            WindowState = FormWindowState.Maximized;
+            this.Height = Screen.PrimaryScreen.Bounds.Height;
+            this.Width = Screen.PrimaryScreen.Bounds.Width;
 
             client = new TcpClient("localhost", 7986);
             stream = client.GetStream();
@@ -34,14 +35,38 @@ namespace WhistCilent
 
             Card[] temp = Card.DesserializeArr(data1); //parse the cards that has been recived
             hand = temp.ToList(); //create List of Cards from the Card array
-            for(int i = 0; i < temp.Length; i++)
-            {
-                Console.WriteLine(temp.ToString() + " ");
-            }
 
-           // cards = temp.ToList();
+            hand = temp.ToList();
+
+            //creating a visual form of the cards
+            CreateCards();
         }
-        
+        void CreateCards()
+        {
+
+            visHand = new List<Label>();
+
+            for (int i = 0; i < 13; i++)
+            {
+                Label label = new Label();
+                Image image = (Image)Properties.Resources.ResourceManager.GetObject(hand[i].GetNum().ToString() + ((int)hand[i].GetShape()).ToString());
+                label.Image = Resize(image, this.Width / 20, this.Height / 15);
+                label.Size = label.Image.Size;
+                label.Location = new Point(this.Width / 20 + (int)(i * label.Size.Width * 1.1), 4 * this.Height / 5);
+
+                Controls.Add(label);
+                visHand.Add(label);
+            }
+        }
+        public Image Resize(Image image, int w, int h)
+        {
+            Bitmap bmp = new Bitmap(w, h);
+            Graphics grp = Graphics.FromImage(bmp);
+            grp.DrawImage(image, 0, 0, w, h);
+            grp.Dispose();
+
+            return bmp;
+        }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.F11)
@@ -64,26 +89,6 @@ namespace WhistCilent
         {
 
         }
-        public static byte[] ObjectToByteArray(Object obj)
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (var ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
-        }
-
-        public static Object ByteArrayToObject(byte[] arrBytes)
-        {
-            using (var memStream = new MemoryStream())
-            {
-                var binForm = new BinaryFormatter();
-                memStream.Write(arrBytes, 0, arrBytes.Length);
-                memStream.Seek(0, SeekOrigin.Begin);
-                object obj = binForm.Deserialize(memStream);
-                return obj;
-            }
-        }
+      
     }
 }

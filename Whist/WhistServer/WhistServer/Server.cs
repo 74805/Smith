@@ -21,6 +21,7 @@ namespace WhistServer
             packet.Shuffle();
             pcards = packet.GetPcards();
 
+            int a = (int)pcards[0][3].GetShape();
             listener =new TcpListener(IPAddress.Any, 7986);
             listener.Start();
 
@@ -41,7 +42,6 @@ namespace WhistServer
                 clients[i] = new Client(name, client, client.GetStream());
                 
                 clients[i].stream.Write(Card.SerializeArr(pcards[i]));
-
             }
         }
         public static byte[] ObjectToByteArray(Object obj)

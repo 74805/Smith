@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace WhistServer
@@ -49,6 +50,17 @@ namespace WhistServer
                 pcards[1][i]=(cards[i + 13]);
                 pcards[2][i] = (cards[i + 26]);
                 pcards[3][i] = (cards[i + 39]);
+            }
+
+            //sorting the cards the players
+
+            int[,] shapeamount = new int[4,3];
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 13; j++) 
+                {
+                    
+                }
             }
 
             return pcards;
