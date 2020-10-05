@@ -22,6 +22,9 @@ namespace WhistCilent
         private List<Label> visHand;
         public WhistClient()
         {
+            FormBorderStyle = FormBorderStyle.None;
+            WindowState = FormWindowState.Maximized;
+
             this.Height = Screen.PrimaryScreen.Bounds.Height;
             this.Width = Screen.PrimaryScreen.Bounds.Width;
 
@@ -50,9 +53,9 @@ namespace WhistCilent
             {
                 Label label = new Label();
                 Image image = (Image)Properties.Resources.ResourceManager.GetObject(hand[i].GetNum().ToString() + ((int)hand[i].GetShape()).ToString());
-                label.Image = Resize(image, this.Width / 20, this.Height / 15);
+                label.Image = Resize(image, (int)(this.Width / 19.45), (int)(this.Height / 7.1591));
                 label.Size = label.Image.Size;
-                label.Location = new Point(this.Width / 20 + (int)(i * label.Size.Width * 1.1), 4 * this.Height / 5);
+                label.Location = new Point((int)(this.Width /6.3)+ (int)(i * label.Size.Width * 1), 4 * this.Height / 5);
 
                 Controls.Add(label);
                 visHand.Add(label);
