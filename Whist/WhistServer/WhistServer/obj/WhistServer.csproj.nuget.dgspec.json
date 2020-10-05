@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj": {}
+    "C:\\Users\\Eyal\\Documents\\GitHub\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj": {}
   },
   "projects": {
-    "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj": {
+    "C:\\Users\\Eyal\\Documents\\GitHub\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
+        "projectUniqueName": "C:\\Users\\Eyal\\Documents\\GitHub\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
         "projectName": "WhistServer",
-        "projectPath": "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
-        "packagesPath": "C:\\Users\\yuval taub\\.nuget\\packages\\",
-        "outputPath": "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\obj\\",
+        "projectPath": "C:\\Users\\Eyal\\Documents\\GitHub\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
+        "packagesPath": "C:\\Users\\Eyal\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Eyal\\Documents\\GitHub\\Smith\\Whist\\WhistServer\\WhistServer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\yuval taub\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Eyal\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

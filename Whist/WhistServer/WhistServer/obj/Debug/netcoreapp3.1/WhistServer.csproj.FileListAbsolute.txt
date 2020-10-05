@@ -11,3 +11,16 @@ D:\יובל\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistSer
 D:\יובל\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.dll
 D:\יובל\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.pdb
 D:\יובל\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.genruntimeconfig.cache
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\bin\Debug\netcoreapp3.1\WhistServer.exe
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\bin\Debug\netcoreapp3.1\WhistServer.deps.json
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\bin\Debug\netcoreapp3.1\WhistServer.runtimeconfig.json
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\bin\Debug\netcoreapp3.1\WhistServer.runtimeconfig.dev.json
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\bin\Debug\netcoreapp3.1\WhistServer.dll
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\bin\Debug\netcoreapp3.1\WhistServer.pdb
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.csprojAssemblyReference.cache
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.AssemblyInfoInputs.cache
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.AssemblyInfo.cs
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.csproj.CoreCompileInputs.cache
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.dll
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.pdb
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistServer\WhistServer\obj\Debug\netcoreapp3.1\WhistServer.genruntimeconfig.cache

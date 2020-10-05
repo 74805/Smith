@@ -24,3 +24,16 @@ D:\יובל\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\WhistCilent.pdb
 D:\יובל\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\Newtonsoft.Json.dll
 D:\יובל\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\Newtonsoft.Json.xml
 D:\יובל\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csproj.CopyComplete
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\WhistCilent.exe.config
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\WhistCilent.exe
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\WhistCilent.pdb
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csprojAssemblyReference.cache
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.Properties.Resources.resources
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.WhistClient.resources
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csproj.GenerateResource.cache
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csproj.CoreCompileInputs.cache
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csproj.CopyComplete
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.exe
+C:\Users\Eyal\Documents\GitHub\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.pdb

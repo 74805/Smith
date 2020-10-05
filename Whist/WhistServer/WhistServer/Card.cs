@@ -8,8 +8,8 @@ using System.Text;
 public enum CardEnum: byte { spade, heart, club ,diamond};
 namespace WhistServer
 {
-    [Serializable]
-    public class Card
+    [Serializable] 
+    public class Card: IComparable
     {
         public static int CARD_LENGTH_BYTES = 8;
         private int num;
@@ -127,7 +127,18 @@ namespace WhistServer
             }
             return result;
         }
+      
+        public int CompareTo(object obj)
+        {
+            Card other = obj as Card;
+            if (other == null)
+                return 1;
 
-
+            if (this.GetShape() == other.GetShape())
+                return this.num > other.num ? -1 : 1;
+       
+            return this.GetShape() > other.GetShape() ? 1 : -1;
+            
+        }
     }
 }

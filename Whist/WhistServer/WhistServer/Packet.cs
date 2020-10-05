@@ -15,10 +15,10 @@ namespace WhistServer
 
             for (int i = 0; i < 13; i++)
             {
-                this.cards[i] = (new Card(i, CardEnum.heart));
-                this.cards[i + 13] = (new Card(i, CardEnum.spade));
-                this.cards[i + 26] = (new Card(i, CardEnum.diamond));
-                this.cards[i + 39] = (new Card(i, CardEnum.club));
+                this.cards[i] = (new Card(i + 2, CardEnum.heart));
+                this.cards[i + 13] = (new Card(i + 2, CardEnum.spade));
+                this.cards[i + 26] = (new Card(i + 2, CardEnum.diamond));
+                this.cards[i + 39] = (new Card(i + 2, CardEnum.club));
             }
         }
         public Card[] GetCards()
@@ -54,23 +54,13 @@ namespace WhistServer
 
             //sorting the cards the players
 
-            int[,] shapeamount = new int[4,3];
-            
-            for (int i = 0; i < 4; i++)
+            List<Card>[] list = new List<Card>[4];
+            for(int i = 0; i < 4; i++)
             {
-                for (int j = 0; j < 13; j++)
-                {
-                    try
-                    {
-                        shapeamount[i, (int)pcards[i][j].GetShape()]++;
-                    }
-                    catch
-                    {
-
-                    }
-                }
+                list[i] = pcards[i].ToList();
+                list[i].Sort();
+                pcards[i] = list[i].ToArray();
             }
-
             return pcards;
         }
     }
