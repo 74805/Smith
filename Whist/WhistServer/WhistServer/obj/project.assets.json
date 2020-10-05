@@ -8,23 +8,23 @@
     ".NETCoreApp,Version=v3.1": []
   },
   "packageFolders": {
-    "C:\\Users\\Eyal\\.nuget\\packages\\": {},
+    "C:\\Users\\yuval taub\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Eyal\\Documents\\GitHub\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
+      "projectUniqueName": "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
       "projectName": "WhistServer",
-      "projectPath": "C:\\Users\\Eyal\\Documents\\GitHub\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
-      "packagesPath": "C:\\Users\\Eyal\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Eyal\\Documents\\GitHub\\Smith\\Whist\\WhistServer\\WhistServer\\obj\\",
+      "projectPath": "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
+      "packagesPath": "C:\\Users\\yuval taub\\.nuget\\packages\\",
+      "outputPath": "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Eyal\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\yuval taub\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

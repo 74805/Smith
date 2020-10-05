@@ -63,9 +63,9 @@ namespace WhistCilent.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _00 {
+        internal static System.Drawing.Bitmap _0 {
             get {
-                object obj = ResourceManager.GetObject("00", resourceCulture);
+                object obj = ResourceManager.GetObject("0", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,39 +73,9 @@ namespace WhistCilent.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _01 {
+        internal static System.Drawing.Bitmap _1 {
             get {
-                object obj = ResourceManager.GetObject("01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap _02 {
-            get {
-                object obj = ResourceManager.GetObject("02", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap _03 {
-            get {
-                object obj = ResourceManager.GetObject("03", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap _10 {
-            get {
-                object obj = ResourceManager.GetObject("10", resourceCulture);
+                object obj = ResourceManager.GetObject("1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -153,16 +123,6 @@ namespace WhistCilent.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _11 {
-            get {
-                object obj = ResourceManager.GetObject("11", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap _110 {
             get {
                 object obj = ResourceManager.GetObject("110", resourceCulture);
@@ -196,16 +156,6 @@ namespace WhistCilent.Properties {
         internal static System.Drawing.Bitmap _113 {
             get {
                 object obj = ResourceManager.GetObject("113", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap _12 {
-            get {
-                object obj = ResourceManager.GetObject("12", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -253,9 +203,89 @@ namespace WhistCilent.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _13 {
+        internal static System.Drawing.Bitmap _130 {
             get {
-                object obj = ResourceManager.GetObject("13", resourceCulture);
+                object obj = ResourceManager.GetObject("130", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _131 {
+            get {
+                object obj = ResourceManager.GetObject("131", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _132 {
+            get {
+                object obj = ResourceManager.GetObject("132", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _133 {
+            get {
+                object obj = ResourceManager.GetObject("133", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _140 {
+            get {
+                object obj = ResourceManager.GetObject("140", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _141 {
+            get {
+                object obj = ResourceManager.GetObject("141", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _142 {
+            get {
+                object obj = ResourceManager.GetObject("142", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _143 {
+            get {
+                object obj = ResourceManager.GetObject("143", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _2 {
+            get {
+                object obj = ResourceManager.GetObject("2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -583,16 +613,6 @@ namespace WhistCilent.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap blue_back {
-            get {
-                object obj = ResourceManager.GetObject("blue_back", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap C {
             get {
                 object obj = ResourceManager.GetObject("C", resourceCulture);
@@ -606,26 +626,6 @@ namespace WhistCilent.Properties {
         internal static System.Drawing.Bitmap D {
             get {
                 object obj = ResourceManager.GetObject("D", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap gray_back {
-            get {
-                object obj = ResourceManager.GetObject("gray_back", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap green_back {
-            get {
-                object obj = ResourceManager.GetObject("green_back", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
