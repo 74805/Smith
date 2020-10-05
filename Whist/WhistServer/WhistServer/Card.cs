@@ -50,18 +50,7 @@ namespace WhistServer
         {
             return this.num + " - " + this.shape;
         }
-        public static byte[] Serialize(Card card)
-        {
-            using (MemoryStream m = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(m))
-                {
-                    writer.Write(card.num);
-                    writer.Write(card.shape);
-                }
-                return m.ToArray();
-            }
-        }
+      
 
         public static Card Desserialize(byte[] data)
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 namespace WhistServer
@@ -51,16 +52,13 @@ namespace WhistServer
             return this.num + " - " + this.shape;
         }
 
-        public byte[] Serialize()
+        public static byte[] ObjectToByteArray(Object obj)
         {
-            using (MemoryStream m = new MemoryStream())
+            BinaryFormatter bf = new BinaryFormatter();
+            using (var ms = new MemoryStream())
             {
-                using (BinaryWriter writer = new BinaryWriter(m))
-                {
-                    writer.Write(num);
-                    writer.Write(shape);
-                }
-                return m.ToArray();
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
             }
         }
 

@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\יובל\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
+      "projectUniqueName": "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
       "projectName": "WhistServer",
-      "projectPath": "D:\\יובל\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
+      "projectPath": "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\WhistServer.csproj",
       "packagesPath": "C:\\Users\\yuval taub\\.nuget\\packages\\",
-      "outputPath": "D:\\יובל\\Whist\\WhistServer\\WhistServer\\obj\\",
+      "outputPath": "D:\\יובל\\Smith\\Whist\\WhistServer\\WhistServer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
