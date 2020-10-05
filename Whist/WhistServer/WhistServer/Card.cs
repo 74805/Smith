@@ -65,8 +65,32 @@ namespace WhistServer
             return "Heart";
 
         }
+        public static byte[] Serialize(Card card)
+        {
+            using (MemoryStream m = new MemoryStream())
+            {
+                using (BinaryWriter writer = new BinaryWriter(m))
+                {
+                    writer.Write(card.num);
+                    writer.Write((int)(card.shape));
+                }
+                return m.ToArray();
+            }
+        }
+        public static byte[] SerializeArr(Card[] cards)
+        {
+            List<byte> data = new List<byte>();
 
-
+            for (int i = 0; i < cards.Length; i++)
+            {
+                byte[] data1 = Card.Serialize(cards[i]);
+                for (int j = 0; j < CARD_LENGTH_BYTES; j++)
+                {
+                    data.Add(data1[j]);
+                }
+            }
+            return data.ToArray();
+        }
         public static Card[] DesserializeArr(byte[] data)
         {
             /*

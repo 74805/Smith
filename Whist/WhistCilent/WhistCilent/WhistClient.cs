@@ -29,7 +29,7 @@ namespace WhistCilent
 
             byte[] data = Encoding.UTF8.GetBytes(Environment.UserName); //save the user name string in bytes array
             stream.Write(data, 0, data.Length); //send the data array
-            byte[] data1 = new byte[256]; 
+            byte[] data1 = new byte[104]; 
             stream.Read(data1, 0, data1.Length); //recive the cards from the server
 
             Card[] temp = Card.DesserializeArr(data1); //parse the cards that has been recived
@@ -41,15 +41,7 @@ namespace WhistCilent
 
            // cards = temp.ToList();
         }
-        public static byte[] ObjectToByteArray(Object obj)
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (var ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
-        }
+        
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.F11)

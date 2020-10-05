@@ -11,3 +11,16 @@ D:\יובל\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.WhistClient.reso
 D:\יובל\Whist\WhistCilent\WhistCilent\bin\Debug\Newtonsoft.Json.dll
 D:\יובל\Whist\WhistCilent\WhistCilent\bin\Debug\Newtonsoft.Json.xml
 D:\יובל\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csproj.CopyComplete
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csprojAssemblyReference.cache
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.Properties.Resources.resources
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.WhistClient.resources
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csproj.GenerateResource.cache
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csproj.CoreCompileInputs.cache
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.exe
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.pdb
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\WhistCilent.exe.config
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\WhistCilent.exe
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\WhistCilent.pdb
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\Newtonsoft.Json.dll
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\bin\Debug\Newtonsoft.Json.xml
+D:\יובל\Smith\Whist\WhistCilent\WhistCilent\obj\Debug\WhistCilent.csproj.CopyComplete

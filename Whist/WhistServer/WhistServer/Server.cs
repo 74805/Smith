@@ -40,7 +40,7 @@ namespace WhistServer
 
                 clients[i] = new Client(name, client, client.GetStream());
                 
-                clients[i].stream.Write(ObjectToByteArray(pcards[i]));
+                clients[i].stream.Write(Card.SerializeArr(pcards[i]));
 
             }
         }
