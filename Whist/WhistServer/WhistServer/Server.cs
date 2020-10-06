@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace WhistServer
 {
@@ -49,12 +50,9 @@ namespace WhistServer
             for (int i = 0; i < 4; i++)//send the names of the other players to a player
             {
                 string sendnames = i.ToString();
-                for (int j = 0; j < 4; j++)
+                for (int j = i+1; j < i+4; j++)
                 {
-                    if (j != i)
-                    {
-                        sendnames += names[j].Length.ToString() + names[j];
-                    }
+                    sendnames += names[j%4].Length.ToString() + names[j%4];
                 }
                 try
                 {
@@ -73,8 +71,10 @@ namespace WhistServer
             trump = ReciveInt(0);
 
             byte[] data;
+            bool isfrish = false;
             if (trump == 5)//frish
             {
+                isfrish = true;
                 data = Encoding.UTF8.GetBytes("a");//tell all clients that its frish
             }
             else
@@ -86,7 +86,34 @@ namespace WhistServer
                 clients[i].stream.Write(data, 0, data.Length);
             
             }
-           // DontCloseServer();
+            if (isfrish)
+            {
+
+            }
+            else
+            {
+                GetAndSendBets();
+            }
+        }
+        void GetAndSendBets()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                clients[i].bet = ReciveInt(i);
+            }
+
+            byte[] data;
+            for (int i = 0; i < 4; i++)
+            {
+                string bets = "";
+                for (int j = i+1; j < i+4; j++)
+                {
+                    string thisbet = clients[j%4].bet.ToString();
+                    bets += thisbet.Length.ToString() + thisbet;
+                }
+                data = Encoding.UTF8.GetBytes(bets);
+                clients[i].stream.Write(data, 0, data.Length);
+            }
         }
         int BackSlash0(string mes)
         {

@@ -10,8 +10,9 @@ namespace WhistServer
         public string name { get; }
         public TcpClient client { get; }
         public NetworkStream stream { get; }
+        public int bet { get; set; }
 
-        public Client(string name, TcpClient client,NetworkStream stream)
+        public Client(string name, TcpClient client, NetworkStream stream)
         {
             this.name = name;
             this.client = client;

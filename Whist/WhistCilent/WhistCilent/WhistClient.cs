@@ -25,7 +25,7 @@ namespace WhistCilent
         private List<Card> hand;
         private List<Label> visHand;
         private List<Label>[] othercards;
-        Label score;
+        Label[] score;
         private Button[] choosetrump;
         public WhistClient()
         {
@@ -139,6 +139,7 @@ namespace WhistCilent
                 choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
                 choosetrump[i].Tag = i;
                 choosetrump[i].Click += TrumpClick;
+
                 this.Invoke(new del(() =>
                 {
                     Controls.Add(choosetrump[i]);
@@ -152,8 +153,6 @@ namespace WhistCilent
 
             int send = (int)trump.Tag;
 
-            SendInt(send);
-
             for (int i = 0; i < 6; i++)
             {
                 Controls.Remove(choosetrump[i]);
@@ -162,8 +161,9 @@ namespace WhistCilent
             {
                 choosetrump = null;
             }
-           
 
+            SendInt(send);
+            
         }
         public void SendInt(int num)
         {
@@ -183,7 +183,7 @@ namespace WhistCilent
 
             clientid = (int)names[0] - 48;
             names = names.Substring(1);
-            Label[] otherplayers = new Label[3]; //Creating labels for other players' name and score
+            score = new Label[4]; //Creating labels for other players' name and score
 
             for (int i = 0; i < 3; i++)
             {
@@ -206,26 +206,25 @@ namespace WhistCilent
                     names = names.Substring(1);
                 }
 
-                otherplayers[i] = new Label();
-                otherplayers[i].Size = new Size(Width / 15, Height / 20);
-                otherplayers[i].Font = new Font("Ariel", 14);
-                otherplayers[i].Text = temp + '\n' + "Score: 0";
+                score[i] = new Label();
+                score[i].Size = new Size(Width / 15, Height / 20);
+                score[i].Font = new Font("Ariel", 14);
+                score[i].Text = temp + '\n' + "Score: 0";
             }
-            otherplayers[0].Location = new Point(0, Height / 2 - otherplayers[0].Size.Height / 2);
-            otherplayers[1].Location = new Point(Width / 2 - otherplayers[1].Size.Width / 2, 0);
-            otherplayers[2].Location = new Point(Width - otherplayers[2].Size.Width, Height / 2 - otherplayers[2].Size.Height / 2);
+            score[0].Location = new Point(0, Height / 2 - score[0].Size.Height / 2);
+            score[1].Location = new Point(Width / 2 - score[1].Size.Width / 2, 0);
+            score[2].Location = new Point(Width - score[2].Size.Width, Height / 2 - score[2].Size.Height / 2);
 
-            score = new Label();
-            score.Size = new Size(Width / 15, Height / 20);
-            score.Location = new Point(Width / 2 - score.Size.Width / 2, Height - (int)(0.6 * score.Size.Height));
-            score.Font = new Font("Ariel", 14);
-            score.Text = "Score: 0";
+            score[3] = new Label();
+            score[3].Size = new Size(Width / 15, Height / 20);
+            score[3].Location = new Point(Width / 2 - score[3].Size.Width / 2, Height - (int)(0.6 * score[3].Size.Height));
+            score[3].Font = new Font("Ariel", 14);
+            score[3].Text = "Score: 0";
             this.Invoke(new del(() =>
             {
-                Controls.Add(score);
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
-                    Controls.Add(otherplayers[i]);
+                    Controls.Add(score[i]);
                 }
             }));
             if (clientid == 0)
@@ -239,18 +238,61 @@ namespace WhistCilent
 
             if (isfrish == 'a')
             {
-                MessageBox.Show("frish");
                 Frish();
             }
             else
             {
-                MessageBox.Show("nig");
                 GetBet();
             }
         }
         void GetBet()
         {
+            choosetrump = new Button[14];
+            for (int i = 0; i < 14; i++)
+            {
+                choosetrump[i] = new Button();
+                choosetrump[i].Size = new Size(Width / 20, Width / 20);
+                choosetrump[i].Text = i.ToString();
+                choosetrump[i].Location = new Point(Width / 2 + (-7 + i) * Width / 20, 3 * Height / 5);
+                choosetrump[i].Click += GotBet;
 
+                this.Invoke(new del(() =>
+                {
+                    Controls.Add(choosetrump[i]);
+                }));
+            }
+        }
+        void GotBet(object sender, EventArgs args)
+        {
+            Button bet = (Button)sender;
+
+            int send = int.Parse(bet.Text);
+
+            score[3].Text += "/" + send;
+
+            for (int i = 0; i < 14; i++)
+            {
+                Controls.Remove(choosetrump[i]);
+                choosetrump[i] = null;
+            }
+            choosetrump = null;
+
+            SendInt(send);
+
+            //getting other's bets
+            byte[] data = new byte[36];
+            stream.Read(data, 0, data.Length);
+
+            string othersbets = Encoding.UTF8.GetString(data);
+            string[] bets = new string[3];
+            for (int i = 0; i < 3; i++)
+            {
+                int len = (int)othersbets[0] - 48;
+
+                bets[i] = othersbets.Substring(1, len);
+                score[i].Text += "/" + bets[i];
+                othersbets = othersbets.Substring(len + 1);
+            }
         }
         public Image Resize(Image image, int w, int h)
         {
