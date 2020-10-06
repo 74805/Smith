@@ -48,12 +48,11 @@ namespace WhistServer
             
             for (int i = 0; i < 4; i++)//send the names of the other players to a player
             {
-                string sendnames = "";
+                string sendnames = i.ToString();
                 for (int j = 0; j < 4; j++)
                 {
                     if (j != i)
-                    {
-
+                    { 
                         sendnames += names[j].Length.ToString() + names[j];
                     }
                 }

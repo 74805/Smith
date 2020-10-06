@@ -19,6 +19,7 @@ namespace WhistCilent
     delegate void del();
     public partial class WhistClient : Form
     {
+        private int clientid;
         private TcpClient client;
         private NetworkStream stream;
         private List<Card> hand;
@@ -93,7 +94,7 @@ namespace WhistCilent
                 Image image = (Image)Properties.Resources.ResourceManager.GetObject(hand[i].GetNum().ToString() + ((int)hand[i].GetShape()).ToString());
                 label.Image = Resize(image, (int)(this.Width / 19.45), (int)(this.Height / 7.1591));
                 label.Size = label.Image.Size;
-                label.Location = new Point((int)(this.Width / 6.3) + (int)(i * label.Size.Width * 1), 4 * this.Height / 5);
+                label.Location = new Point((int)(this.Width / 2-6.5*label.Size.Width) + (int)(i * label.Size.Width * 1), 4 * this.Height / 5);
 
                 Controls.Add(label);
                 visHand.Add(label);
@@ -115,6 +116,26 @@ namespace WhistCilent
             }
             
         }
+        void GetBet()
+        {
+            if (clientid == 0)
+            {
+                Button[] choosecut = new Button[4];
+
+                for (int i = 0; i < 4; i++)
+                {
+                    choosecut[i] = new Button();
+                    Image image = (Image)Properties.Resources.ResourceManager.GetObject((10 + i).ToString());
+                    choosecut[i].Image = Resize(image,(int)( 0.055339*Width),(int)(0.09838*Height));
+                    choosecut[i].Size = choosecut[i].Image.Size;
+                    choosecut[i].Location = new Point(Width/2+(i-2)*choosecut[i].Size.Width,  4*Height / 7); 
+                    this.Invoke(new del(() =>
+                    {
+                        Controls.Add(choosecut[i]);
+                    }));
+                }
+            }
+        }
         void PlaceNames()
         {
             byte[] data = new byte[256];
@@ -123,6 +144,8 @@ namespace WhistCilent
 
             string names = Encoding.UTF8.GetString(data);
 
+            clientid = (int)names[0] - 48;
+            names = names.Substring(1);
             Label[] otherplayers = new Label[3]; //Creating labels for other players' name and score
 
             for (int i = 0; i < 3; i++)
@@ -168,7 +191,7 @@ namespace WhistCilent
                     Controls.Add(otherplayers[i]);
                 }
             }));
-            
+            GetBet();
         }
 
         public Image Resize(Image image, int w, int h)
