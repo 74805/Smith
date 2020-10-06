@@ -9,12 +9,14 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WhistServer;
 
 namespace WhistCilent
 {
+    delegate void del();
     public partial class WhistClient : Form
     {
         private TcpClient client;
@@ -22,6 +24,7 @@ namespace WhistCilent
         private List<Card> hand;
         private List<Label> visHand;
         private List<Label>[] othercards;
+        Label score;
         public WhistClient()
         {
             FormBorderStyle = FormBorderStyle.None;
@@ -35,7 +38,7 @@ namespace WhistCilent
 
             byte[] data = Encoding.UTF8.GetBytes(Environment.UserName); //save the user name string in bytes array
             stream.Write(data, 0, data.Length); //send the data array
-            byte[] data1 = new byte[104]; 
+            byte[] data1 = new byte[104];
             stream.Read(data1, 0, data1.Length); //recive the cards from the server
 
             Card[] temp = Card.DesserializeArr(data1); //parse the cards that has been recived
@@ -44,9 +47,13 @@ namespace WhistCilent
             hand = temp.ToList();
 
             //creating a visual form of the cards
-            CreateCards();
+            Shown += CreateCards;
+
+            Thread thread = new Thread(PlaceNames);
+            //put names on screes yes?
+            thread.Start();
         }
-        void CreateCards()
+        void CreateCards(object sender,EventArgs args)
         {
             othercards = new List<Label>[3];
             for (int i = 0; i < 3; i++)
@@ -55,30 +62,29 @@ namespace WhistCilent
 
                 Label label = new Label();
                 Image image = (Image)Properties.Resources.ResourceManager.GetObject(i.ToString());
-                label.Image = i == 1 ? Resize(image, (int)(this.Width / 24.3125), (int)(this.Height / 8.95)) : Resize(image, (int)(this.Height / 8.95), (int)(this.Width / 24.3125)) ;
+                label.Image = i == 1 ? Resize(image, (int)(this.Width / 24.3125), (int)(this.Height / 8.95)) : Resize(image, (int)(this.Height / 8.95), (int)(this.Width / 24.3125));
                 label.Size = label.Image.Size;
-                
+
                 if (i == 0)
                 {
-                    label.Location = new Point(Width / 20, Height / 10);
+                    label.Location = new Point(Width / 15, (int)(Height /5));
                 }
                 else
                 {
                     if (i == 1)
                     {
-                        label.Location = new Point(Width / 5, Height / 30);
+                        label.Location = new Point((int)(Width / 3.6), Height / 20);
                     }
                     else
                     {
-                        label.Location = new Point(Width-Width/20-label.Size.Width, Height / 10);
+                        label.Location = new Point(Width - Width / 15 - label.Size.Width, (int)(Height /5));
                     }
                 }
-                
 
                 Controls.Add(label);
                 othercards[i].Add(label);
             }
-            
+
             visHand = new List<Label>();
 
             for (int i = 0; i < 13; i++)
@@ -96,10 +102,10 @@ namespace WhistCilent
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        Label label1 =new Label();
+                        Label label1 = new Label();
                         label1.Image = othercards[j][0].Image;
                         label1.Size = othercards[j][0].Size;
-                        label1.Location = j == 1 ? new Point(othercards[j][0].Location.X + i * label1.Size.Width, othercards[j][0].Location.Y) : new Point(othercards[j][0].Location.X, othercards[j][0].Location.Y + (int)(0.8 * label1.Size.Height) * i);
+                        label1.Location = j == 1 ? new Point(othercards[j][0].Location.X + (int)(i * 0.8 * label1.Size.Width), othercards[j][0].Location.Y) : new Point(othercards[j][0].Location.X, othercards[j][0].Location.Y + (int)(0.65 * label1.Size.Height) * i);
 
                         Controls.Add(label1);
                         othercards[j].Add(label1);
@@ -107,7 +113,64 @@ namespace WhistCilent
                 }
 
             }
+            
         }
+        void PlaceNames()
+        {
+            byte[] data = new byte[256];
+
+            stream.Read(data, 0, data.Length);//getting other players' names
+
+            string names = Encoding.UTF8.GetString(data);
+
+            Label[] otherplayers = new Label[3]; //Creating labels for other players' name and score
+
+            for (int i = 0; i < 3; i++)
+            {
+                string temp = "";
+                int namelen;
+                try
+                {
+                    namelen = int.Parse(names.Substring(0,2));
+                    names = names.Substring(2);
+                }
+                catch
+                {
+                    namelen = (int)names[1] - 48;
+                    names = names.Substring(1);
+                }
+
+                for (int j = 0; j < namelen; j++)
+                {
+                    temp += names[0];
+                    names = names.Substring(1);
+                }
+
+                otherplayers[i] = new Label();
+                otherplayers[i].Size = new Size(Width / 15, Height / 20);
+                otherplayers[i].Font = new Font("Ariel", 14);
+                otherplayers[i].Text = temp + '\n' + "Score: 0";
+            }
+            otherplayers[0].Location = new Point(0, Height / 2 - otherplayers[0].Size.Height / 2);
+            otherplayers[1].Location = new Point(Width / 2 - otherplayers[1].Size.Width / 2, 0);
+            otherplayers[2].Location = new Point(Width - otherplayers[2].Size.Width, Height / 2 - otherplayers[2].Size.Height / 2);
+
+            score = new Label();
+            score.Size= new Size(Width / 15, Height / 20);
+            score.Location = new Point(Width / 2 - score.Size.Width / 2, Height - (int)(0.6*score.Size.Height));
+            score.Font = new Font("Ariel", 14);
+            score.Text = "Score: 0";
+            this.Invoke(new del(() =>
+            {
+                Controls.Add(score);
+                for (int i = 0; i < 3; i++)
+                {
+                    Controls.Add(otherplayers[i]);
+                }
+            }));
+            
+        }
+
         public Image Resize(Image image, int w, int h)
         {
             Bitmap bmp = new Bitmap(w, h);
@@ -139,6 +202,6 @@ namespace WhistCilent
         {
 
         }
-      
+
     }
 }
