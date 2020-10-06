@@ -157,13 +157,54 @@ namespace WhistCilent
             {
                 Controls.Remove(choosetrump[i]);
             }
-            if (send != 5)
+            if (send == 5)
             {
-                choosetrump = null;
+                SendInt(send);
+            }
+            else
+            {
+                choosetrump = new Button[4];
+
+                for (int i = 0; i < 4; i++)
+                {
+                    choosetrump[i] = new Button();
+                    choosetrump[i].Font = new Font("Ariel", 14);
+                    choosetrump[i].Text =i==3?"You":GetName(score[i].Text);
+                    choosetrump[i].Size = new Size(Width / 20, Width / 20) ;
+                    choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
+                    choosetrump[i].Tag = send*10+(i+clientid)%4;
+                    choosetrump[i].Click += FirstPlayerClick;
+                    Controls.Add(choosetrump[i]);
+
+                }
             }
 
+
+
+
+        }
+        void FirstPlayerClick(object sender,EventArgs args)
+        {
+            Button firstplayer = (Button)sender;
+
+            int send = (int)firstplayer.Tag;
+
+            for (int i = 0; i < 4; i++)
+            {
+                Controls.Remove(choosetrump[i]);
+            }
             SendInt(send);
-            
+        }
+        string GetName(string score)
+        {
+            for (int i = 0; i < score.Length; i++)
+            {
+                if (score[i] == '\n')
+                {
+                    return score.Substring(0, i + 1);
+                }
+            }
+            return score;
         }
         public void SendInt(int num)
         {
