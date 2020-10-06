@@ -26,6 +26,7 @@ namespace WhistCilent
         private List<Label> visHand;
         private List<Label>[] othercards;
         Label score;
+        private Button[] choosetrump;
         public WhistClient()
         {
             FormBorderStyle = FormBorderStyle.None;
@@ -54,7 +55,7 @@ namespace WhistCilent
             //put names on screes yes?
             thread.Start();
         }
-        void CreateCards(object sender,EventArgs args)
+        void CreateCards(object sender, EventArgs args)
         {
             othercards = new List<Label>[3];
             for (int i = 0; i < 3; i++)
@@ -68,7 +69,7 @@ namespace WhistCilent
 
                 if (i == 0)
                 {
-                    label.Location = new Point(Width / 15, (int)(Height /5));
+                    label.Location = new Point(Width / 15, (int)(Height / 5));
                 }
                 else
                 {
@@ -78,7 +79,7 @@ namespace WhistCilent
                     }
                     else
                     {
-                        label.Location = new Point(Width - Width / 15 - label.Size.Width, (int)(Height /5));
+                        label.Location = new Point(Width - Width / 15 - label.Size.Width, (int)(Height / 5));
                     }
                 }
 
@@ -94,7 +95,7 @@ namespace WhistCilent
                 Image image = (Image)Properties.Resources.ResourceManager.GetObject(hand[i].GetNum().ToString() + ((int)hand[i].GetShape()).ToString());
                 label.Image = Resize(image, (int)(this.Width / 19.45), (int)(this.Height / 7.1591));
                 label.Size = label.Image.Size;
-                label.Location = new Point((int)(this.Width / 2-6.5*label.Size.Width) + (int)(i * label.Size.Width * 1), 4 * this.Height / 5);
+                label.Location = new Point((int)(this.Width / 2 - 6.5 * label.Size.Width) + (int)(i * label.Size.Width * 1), 4 * this.Height / 5);
 
                 Controls.Add(label);
                 visHand.Add(label);
@@ -114,27 +115,63 @@ namespace WhistCilent
                 }
 
             }
-            
-        }
-        void GetBet()
-        {
-            if (clientid == 0)
-            {
-                Button[] choosecut = new Button[4];
 
-                for (int i = 0; i < 4; i++)
+        }
+        void GetTrump()
+        {
+
+            choosetrump = new Button[6];
+
+            for (int i = 0; i < 6; i++)
+            {
+                choosetrump[i] = new Button();
+                if (i < 4)
                 {
-                    choosecut[i] = new Button();
                     Image image = (Image)Properties.Resources.ResourceManager.GetObject((10 + i).ToString());
-                    choosecut[i].Image = Resize(image,(int)( 0.055339*Width),(int)(0.09838*Height));
-                    choosecut[i].Size = choosecut[i].Image.Size;
-                    choosecut[i].Location = new Point(Width/2+(i-2)*choosecut[i].Size.Width,  4*Height / 7); 
-                    this.Invoke(new del(() =>
-                    {
-                        Controls.Add(choosecut[i]);
-                    }));
+                    choosetrump[i].Image = Resize(image, (int)(0.055339 * Width), (int)(0.09838 * Height));
                 }
+                else
+                {
+                    choosetrump[i].Font = new Font("Ariel", 14);
+                    choosetrump[i].Text = i == 4 ? "ללא שליט" : "פריש";
+                }
+                choosetrump[i].Size = choosetrump[0].Image.Size;
+                choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
+                choosetrump[i].Tag = i;
+                choosetrump[i].Click += TrumpClick;
+                this.Invoke(new del(() =>
+                {
+                    Controls.Add(choosetrump[i]);
+                }));
             }
+
+        }
+        void TrumpClick(object sender, EventArgs args)
+        {
+            Button trump = (Button)sender;
+
+            int send = (int)trump.Tag;
+
+            SendInt(send);
+
+            for (int i = 0; i < 6; i++)
+            {
+                Controls.Remove(choosetrump[i]);
+            }
+            if (send != 5)
+            {
+                choosetrump = null;
+            }
+           
+
+        }
+        public void SendInt(int num)
+        {
+            this.stream.Write(new byte[1] { (byte)num }, 0, 1);
+        }
+        void Frish()
+        {
+
         }
         void PlaceNames()
         {
@@ -154,7 +191,7 @@ namespace WhistCilent
                 int namelen;
                 try
                 {
-                    namelen = int.Parse(names.Substring(0,2));
+                    namelen = int.Parse(names.Substring(0, 2));
                     names = names.Substring(2);
                 }
                 catch
@@ -179,8 +216,8 @@ namespace WhistCilent
             otherplayers[2].Location = new Point(Width - otherplayers[2].Size.Width, Height / 2 - otherplayers[2].Size.Height / 2);
 
             score = new Label();
-            score.Size= new Size(Width / 15, Height / 20);
-            score.Location = new Point(Width / 2 - score.Size.Width / 2, Height - (int)(0.6*score.Size.Height));
+            score.Size = new Size(Width / 15, Height / 20);
+            score.Location = new Point(Width / 2 - score.Size.Width / 2, Height - (int)(0.6 * score.Size.Height));
             score.Font = new Font("Ariel", 14);
             score.Text = "Score: 0";
             this.Invoke(new del(() =>
@@ -191,9 +228,30 @@ namespace WhistCilent
                     Controls.Add(otherplayers[i]);
                 }
             }));
-            GetBet();
-        }
+            if (clientid == 0)
+            {
+                GetTrump();
+            }
+            byte[] data1 = new byte[256];
+            stream.Read(data1, 0, data1.Length);
 
+            char isfrish = Encoding.UTF8.GetString(data1)[0];
+
+            if (isfrish == 'a')
+            {
+                MessageBox.Show("frish");
+                Frish();
+            }
+            else
+            {
+                MessageBox.Show("nig");
+                GetBet();
+            }
+        }
+        void GetBet()
+        {
+
+        }
         public Image Resize(Image image, int w, int h)
         {
             Bitmap bmp = new Bitmap(w, h);
