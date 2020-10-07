@@ -183,7 +183,7 @@ namespace WhistCilent
                     choosetrump[i].Text = i == 3 ? "You" : GetName(score[i].Text);
                     choosetrump[i].Size = new Size(Width / 20, Width / 20);
                     choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
-                    choosetrump[i].Tag = send * 10 + (i + clientid) % 4;
+                    choosetrump[i].Tag = send * 10 + (1 + i + clientid) % 4;
                     choosetrump[i].Click += FirstPlayerClick;
                     Controls.Add(choosetrump[i]);
 
