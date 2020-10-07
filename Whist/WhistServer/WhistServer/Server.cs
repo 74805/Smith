@@ -85,7 +85,15 @@ namespace WhistServer
             }
             else
             {
-                data = Encoding.UTF8.GetBytes("b");//tell all clients to bet
+                if (trump == 6)
+                {
+                    data = Encoding.UTF8.GetBytes("c");//tell all clients to start over the game
+                }
+                else
+                {
+                    data = Encoding.UTF8.GetBytes("b");//tell all clients to bet
+
+                }
             }
             for (int i = 0; i < 4; i++)
             {
@@ -97,9 +105,18 @@ namespace WhistServer
             }
             else
             {
-                GetAndSendBets();
+                if (trump < 5)
+                {
+
+                    GetAndSendBets();
+                }
+                else
+                {
+                    NewGame();
+                }
             }
         }
+       
         void GetFrishCards()
         {
             Card[][] frishcards = new Card[4][];
@@ -118,7 +135,6 @@ namespace WhistServer
                         }
                     }
                 }
-                
             }
 
             for (int i = 0; i < 4; i++)//send each player the cards that he got
@@ -133,6 +149,17 @@ namespace WhistServer
                 threads[i] = new Thread(SendIndex);
                 threads[i].Start(i);
             }
+            bool areallplayersdone = true;
+            while (areallplayersdone)
+            {
+                areallplayersdone = !(pcards[0].Count == 13 && pcards[1].Count == 13 && pcards[2].Count == 13 && pcards[3].Count == 13); 
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                clients[i].stream.Write(new byte[] { 0 });
+            }
+            threads = null;
+            GetTrump();
         }
         void SendIndex(object clientid)
         {
@@ -156,12 +183,10 @@ namespace WhistServer
                     }
                 }
             }
+        }
+        void NewGame()//start a new game
+        {
 
-           
-            for (int i = id+1; i < id + 4; i++)
-            {
-                SendInt((id + i % 4) % 4, i % 4);
-            }
         }
         public void SendInt(int num,int clientid)
         {

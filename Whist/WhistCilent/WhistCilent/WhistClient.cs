@@ -26,7 +26,7 @@ namespace WhistCilent
         private List<Card> hand;
         private List<Label> visHand;
         private List<Label>[] othercards;
-        Label[] score;
+        private Label[] score;
         private Button[] choosetrump;
         private Label[,] frishcards;
         public WhistClient()
@@ -120,7 +120,7 @@ namespace WhistCilent
             }
 
         }
-        void GetTrump()
+        void GetTrump(bool isafterfrish)
         {
 
             choosetrump = new Button[6];
@@ -136,11 +136,18 @@ namespace WhistCilent
                 else
                 {
                     choosetrump[i].Font = new Font("Ariel", 14);
-                    choosetrump[i].Text = i == 4 ? "ללא שליט" : "פריש";
+                    choosetrump[i].Text = i == 4 ? "ללא שליט" :isafterfrish? "משחק חדש": "פריש";
                 }
                 choosetrump[i].Size = choosetrump[0].Image.Size;
                 choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
-                choosetrump[i].Tag = i;
+                if ((isafterfrish && i == 5))
+                {
+                    choosetrump[5].Tag = 6;
+                }
+                else
+                {
+                    choosetrump[i].Tag = i;
+                }
                 choosetrump[i].Click += TrumpClick;
 
                 this.Invoke(new del(() =>
@@ -160,12 +167,13 @@ namespace WhistCilent
             {
                 Controls.Remove(choosetrump[i]);
             }
-            if (send == 5)
+            if (send == 5|| send == 6)
             {
                 SendInt(send);
             }
             else
             {
+               
                 choosetrump = new Button[4];
 
                 for (int i = 0; i < 4; i++)
@@ -181,10 +189,6 @@ namespace WhistCilent
 
                 }
             }
-
-
-
-
         }
         void FirstPlayerClick(object sender, EventArgs args)
         {
@@ -292,23 +296,48 @@ namespace WhistCilent
                         Controls.Add(frishcards[2, j]);
                     }));
                 }
-                Thread thread = new Thread(IsDoneTakingCards);
-                thread.Start();
+
+                
             }
         }
         void IsDoneTakingCards()
         {
+            byte[] data = new byte[1];
+            stream.Read(data, 0, data.Length);
+
             for (int j=0;j<3;j++)
             {
-                int id = ReciveInt();//gets the id of the player who has finished taking his cards
-
                 for (int i = 0; i < 3; i++)
                 {
-                    Controls.Remove(frishcards[id, i]);
-                    frishcards[id, i] = null;
+                    Controls.Remove(frishcards[j, i]);
+                    frishcards[j, i] = null;
                 }
             }
+            frishcards = null;
+
+            if (clientid == 0)
+            {
+                GetTrump(true);
+            }
+            Thread thread = new Thread(NewGameOrStartGame);
+            thread.Start();
            
+        }
+        void NewGameOrStartGame()
+        {
+            byte[] data1 = new byte[1];
+            stream.Read(data1, 0, data1.Length);
+
+            char isnewgame = Encoding.UTF8.GetString(data1)[0];
+
+            if (isnewgame == 'c')
+            {
+                NewGame();
+            }
+            else
+            {
+                GetBet();
+            }
         }
         void PlaceFrishCards(object sender,EventArgs args)
         {
@@ -334,6 +363,11 @@ namespace WhistCilent
                 visHand[i].Location = new Point(visHand[i].Location.X - visHand[i].Size.Width / 2, visHand[i].Location.Y);
             }
             visHand[index].Location = new Point(visHand[0].Location.X + index * visHand[0].Size.Width, visHand[0].Location.Y);
+
+            if (visHand.Count == 13)
+            {
+                IsDoneTakingCards();
+            }
         }
         void PlaceNames()
         {
@@ -391,9 +425,9 @@ namespace WhistCilent
             }));
             if (clientid == 0)
             {
-                GetTrump();
+                GetTrump(false);
             }
-            byte[] data1 = new byte[256];
+            byte[] data1 = new byte[1];
             stream.Read(data1, 0, data1.Length);
 
             char isfrish = Encoding.UTF8.GetString(data1)[0];
@@ -497,6 +531,10 @@ namespace WhistCilent
             grp.Dispose();
 
             return bmp;
+        }
+        void NewGame()
+        {
+
         }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
