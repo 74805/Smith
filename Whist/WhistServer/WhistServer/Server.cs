@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace WhistServer
 {
@@ -50,9 +48,9 @@ namespace WhistServer
             for (int i = 0; i < 4; i++)//send the names of the other players to a player
             {
                 string sendnames = i.ToString();
-                for (int j = i+1; j < i+4; j++)
+                for (int j = i + 1; j < i + 4; j++)
                 {
-                    sendnames += names[j%4].Length.ToString() + names[j%4];
+                    sendnames += names[j % 4].Length.ToString() + names[j % 4];
                 }
                 try
                 {
@@ -81,18 +79,30 @@ namespace WhistServer
             {
                 data = Encoding.UTF8.GetBytes("b");//tell all clients to bet
             }
-            for (int i = 0; i < 4; i++) 
+            for (int i = 0; i < 4; i++)
             {
                 clients[i].stream.Write(data, 0, data.Length);
-            
             }
             if (isfrish)
             {
-
+                GetFrishCards();
             }
             else
             {
                 GetAndSendBets();
+            }
+        }
+        void GetFrishCards()
+        {
+            Card[][] frishcards = new Card[4][];
+            for (int i = 0; i < 4; i++)
+            {
+                frishcards[i] = RecieveCardArr(3, i);
+            }
+
+            for (int i = 0; i < 4; i++)//send each player the cards that he got
+            {
+                SendCardArr(frishcards[i == 0 ? 3 : i - 1], i);
             }
         }
         void GetAndSendBets()
@@ -106,9 +116,9 @@ namespace WhistServer
             for (int i = 0; i < 4; i++)
             {
                 string bets = "";
-                for (int j = i+1; j < i+4; j++)
+                for (int j = i + 1; j < i + 4; j++)
                 {
-                    string thisbet = clients[j%4].bet.ToString();
+                    string thisbet = clients[j % 4].bet.ToString();
                     bets += thisbet.Length.ToString() + thisbet;
                 }
                 data = Encoding.UTF8.GetBytes(bets);
@@ -152,6 +162,26 @@ namespace WhistServer
             {
                 Thread.Sleep(1000000);
             }
+        }
+        Card[] RecieveCardArr(int length, int clientid)
+        {
+            byte[] data = new byte[8 * length];
+            try
+            {
+                clients[clientid].stream.Read(data, 0, data.Length);
+            }
+            catch
+            {
+
+            }
+
+            Card[] cards = Card.DesserializeArr(data);
+            return cards;
+        }
+        void SendCardArr(Card[] cards,int clientid)
+        {
+            byte[] data = Card.SerializeArr(cards);
+            clients[clientid].stream.Write(data);
         }
     }
 }

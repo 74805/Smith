@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
@@ -27,6 +28,7 @@ namespace WhistCilent
         private List<Label>[] othercards;
         Label[] score;
         private Button[] choosetrump;
+        private Label[,] frishcards;
         public WhistClient()
         {
             FormBorderStyle = FormBorderStyle.None;
@@ -35,7 +37,7 @@ namespace WhistCilent
             this.Height = Screen.PrimaryScreen.Bounds.Height;
             this.Width = Screen.PrimaryScreen.Bounds.Width;
 
-            client = new TcpClient("localhost", 7986);
+            client = new TcpClient("213.57.202.58", 7986);
             stream = client.GetStream();
 
             byte[] data = Encoding.UTF8.GetBytes(Environment.UserName); //save the user name string in bytes array
@@ -96,6 +98,7 @@ namespace WhistCilent
                 label.Image = Resize(image, (int)(this.Width / 19.45), (int)(this.Height / 7.1591));
                 label.Size = label.Image.Size;
                 label.Location = new Point((int)(this.Width / 2 - 6.5 * label.Size.Width) + (int)(i * label.Size.Width * 1), 4 * this.Height / 5);
+                label.Tag = hand[i];
 
                 Controls.Add(label);
                 visHand.Add(label);
@@ -169,10 +172,10 @@ namespace WhistCilent
                 {
                     choosetrump[i] = new Button();
                     choosetrump[i].Font = new Font("Ariel", 14);
-                    choosetrump[i].Text =i==3?"You":GetName(score[i].Text);
-                    choosetrump[i].Size = new Size(Width / 20, Width / 20) ;
+                    choosetrump[i].Text = i == 3 ? "You" : GetName(score[i].Text);
+                    choosetrump[i].Size = new Size(Width / 20, Width / 20);
                     choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
-                    choosetrump[i].Tag = send*10+(i+clientid)%4;
+                    choosetrump[i].Tag = send * 10 + (i + clientid) % 4;
                     choosetrump[i].Click += FirstPlayerClick;
                     Controls.Add(choosetrump[i]);
 
@@ -183,7 +186,7 @@ namespace WhistCilent
 
 
         }
-        void FirstPlayerClick(object sender,EventArgs args)
+        void FirstPlayerClick(object sender, EventArgs args)
         {
             Button firstplayer = (Button)sender;
 
@@ -212,7 +215,83 @@ namespace WhistCilent
         }
         void Frish()
         {
+            frishcards = new Label[4, 3];
+            foreach (Label label in visHand)
+            {
+                label.Click += FrishClick;
+            }
+        }
+        void FrishClick(object sender, EventArgs args)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                if (frishcards[0, i] == null)
+                {
+                    Label card = (Label)sender;
+                    frishcards[0, i] = card;
+                    NewPosition(card);
+                    frishcards[0, i].Image = othercards[0][0].Image;
+                    frishcards[0, i].Size = othercards[0][0].Size;
+                    frishcards[0, i].Location = new Point(Width / 5, Height / 2 + (2*i - 3) * card.Size.Height / 2);
+                    visHand.Remove(card);
 
+                    if (i == 2)
+                    {
+                        Thread frish = new Thread(GetFrishCards);
+                        frish.Start();
+
+                    }
+                    break;
+                }
+
+
+            }
+            void GetFrishCards()
+            {
+                foreach (Label label in visHand)
+                {
+                    label.Click -= FrishClick;
+                }
+
+                Card[] cards = new Card[3];
+                for (int j = 0; j < 3; j++)
+                {
+                    cards[j] = (Card)frishcards[0, j].Tag;
+                }
+                SendCardArr(cards);
+
+                Card[] getfrishcards = RecieveCardArr(3);
+
+                for (int j = 0; j < 3; j++)
+                {
+                    frishcards[3, j] = new Label();
+                    Image image = (Image)Properties.Resources.ResourceManager.GetObject(getfrishcards[j].GetNum().ToString() + ((int)getfrishcards[j].GetShape()).ToString());
+                    frishcards[3, j].Image = Resize(image, visHand[0].Size.Width, visHand[0].Size.Height);
+                    frishcards[3, j].Size = visHand[0].Size;
+                    frishcards[3, j].Tag = getfrishcards[j];
+                    frishcards[3, j].Location = new Point(Width / 2 + (j*2 - 3) * (frishcards[3, j].Size.Width / 2), 3 * Height / 5);
+                    this.Invoke(new del(() =>
+                    {
+                    Controls.Add(frishcards[3, j]);
+                    }));
+
+                    for (int i = 1; i < 3; i++)
+                    {
+                        frishcards[i, j] = new Label();
+                        frishcards[i, j].Image = othercards[i][0].Image;
+                        frishcards[i, j].Size = othercards[i][0].Size;
+
+                    }
+                    frishcards[1, j].Location = new Point(Width / 2 + (2 * j - 3) * (frishcards[1, j].Size.Width / 2), Height / 6);
+                    frishcards[2, j].Location = new Point(4 * Width / 5, Height / 2 + (2 * j - 3) * frishcards[2,j].Size.Height / 2);
+                    this.Invoke(new del(() =>
+                    {
+                        Controls.Add(frishcards[3, j]);
+                        Controls.Add(frishcards[1, j]);
+                        Controls.Add(frishcards[2, j]);
+                    }));
+                }
+            }
         }
         void PlaceNames()
         {
@@ -302,6 +381,34 @@ namespace WhistCilent
                     Controls.Add(choosetrump[i]);
                 }));
             }
+        }
+        void NewPosition(Label card)
+        {
+            foreach (Label label in visHand)
+            {
+                if (label.Location.X < card.Location.X)
+                {
+                    label.Location = new Point(label.Location.X + label.Size.Width / 2, label.Location.Y);
+                }
+                else if (label.Location.X > card.Location.X)
+                {
+                    label.Location = new Point(label.Location.X - label.Size.Width / 2, label.Location.Y);
+                }
+            }
+
+        }
+        void SendCardArr(Card[] cards)
+        {
+            byte[] data = Card.SerializeArr(cards);
+            stream.Write(data, 0, data.Length);
+        }
+        Card[] RecieveCardArr(int length)
+        {
+            byte[] data = new byte[8 * length];
+            stream.Read(data, 0, data.Length);
+
+            Card[] cards = Card.DesserializeArr(data);
+            return cards;
         }
         void GotBet(object sender, EventArgs args)
         {

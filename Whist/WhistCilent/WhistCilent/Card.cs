@@ -90,11 +90,13 @@ namespace WhistServer
             }
             return data.ToArray();
         }
-
         public static Card[] DesserializeArr(byte[] data)
         {
             /*
              Card = 8 Bytes
+
+
+            [1,2,1,1,2,1,2,1,2]
             */
 
             int lengthOfArr = data.Length / CARD_LENGTH_BYTES;
