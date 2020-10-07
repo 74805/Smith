@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -13,18 +15,24 @@ namespace WhistServer
         private TcpListener listener;
         private Thread waitforclients;
         private Client[] clients = new Client[4];
-        private Card[][] pcards = new Card[4][];
+        private List<Card>[] pcards = new List<Card>[4];
         private string[] names = new string[4];
         private int trump;
         public Server()
         {
             Packet packet = new Packet();
             packet.Shuffle();
-            pcards = packet.GetPcards();
+
+            Card[][] pcards = packet.GetPcards();
 
             int a = (int)pcards[0][3].GetShape();
             listener = new TcpListener(IPAddress.Any, 7986);
             listener.Start();
+
+            for (int i = 0; i < 4; i++)
+            {
+                this.pcards[i] = pcards[i].ToList();
+            }
 
             WaitForClient();
         }
@@ -42,7 +50,7 @@ namespace WhistServer
 
                 clients[i] = new Client(name, client, client.GetStream());
 
-                clients[i].stream.Write(Card.SerializeArr(pcards[i]));
+                clients[i].stream.Write(Card.SerializeArr(pcards[i].ToArray()));
             }
 
             for (int i = 0; i < 4; i++)//send the names of the other players to a player
@@ -95,15 +103,77 @@ namespace WhistServer
         void GetFrishCards()
         {
             Card[][] frishcards = new Card[4][];
+            
             for (int i = 0; i < 4; i++)
             {
                 frishcards[i] = RecieveCardArr(3, i);
+                
+                foreach (Card card in frishcards[i])
+                {
+                    foreach (Card card1 in pcards[i].ToArray())
+                    {
+                        if (card.GetNum()==card1.GetNum()&& card.GetShape() == card1.GetShape())
+                        {
+                            pcards[i].Remove(card1);
+                        }
+                    }
+                }
+                
             }
 
             for (int i = 0; i < 4; i++)//send each player the cards that he got
             {
                 SendCardArr(frishcards[i == 0 ? 3 : i - 1], i);
             }
+            Thread.Sleep(100);
+
+            Thread[] threads = new Thread[4];
+            for (int i = 0; i < 4; i++)
+            {
+                threads[i] = new Thread(SendIndex);
+                threads[i].Start(i);
+            }
+        }
+        void SendIndex(object clientid)
+        {
+            int id = (int)clientid;
+
+            for (int i = 0; i < 3; i++)
+            {
+                Card findindex = RecieveCard(id);
+                pcards[id].Add(findindex);
+                pcards[id].Sort();
+
+                int index;
+
+                for (int j = 0; j < pcards[id].Count; j++)
+                {
+                    if (findindex.GetNum()==pcards[id][j].GetNum()&& findindex.GetShape() == pcards[id][j].GetShape())
+                    {
+                        index = j;
+
+                        SendInt(index,id);
+                    }
+                }
+            }
+
+           
+            for (int i = id+1; i < id + 4; i++)
+            {
+                SendInt((id + i % 4) % 4, i % 4);
+            }
+        }
+        public void SendInt(int num,int clientid)
+        {
+            clients[clientid].stream.Write(new byte[1] { (byte)num }, 0, 1);
+        }
+        Card RecieveCard(int clientid)
+        {
+            byte[] data = new byte[8];
+            clients[clientid].stream.Read(data, 0, data.Length);
+
+            Card card = Card.Desserialize(data);
+            return card;
         }
         void GetAndSendBets()
         {
@@ -178,7 +248,7 @@ namespace WhistServer
             Card[] cards = Card.DesserializeArr(data);
             return cards;
         }
-        void SendCardArr(Card[] cards,int clientid)
+        void SendCardArr(Card[] cards, int clientid)
         {
             byte[] data = Card.SerializeArr(cards);
             clients[clientid].stream.Write(data);

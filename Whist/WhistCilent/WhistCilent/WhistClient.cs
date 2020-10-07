@@ -270,6 +270,7 @@ namespace WhistCilent
                     frishcards[3, j].Size = visHand[0].Size;
                     frishcards[3, j].Tag = getfrishcards[j];
                     frishcards[3, j].Location = new Point(Width / 2 + (j*2 - 3) * (frishcards[3, j].Size.Width / 2), 3 * Height / 5);
+                    frishcards[3, j].Click += PlaceFrishCards;
                     this.Invoke(new del(() =>
                     {
                     Controls.Add(frishcards[3, j]);
@@ -291,7 +292,48 @@ namespace WhistCilent
                         Controls.Add(frishcards[2, j]);
                     }));
                 }
+                Thread thread = new Thread(IsDoneTakingCards);
+                thread.Start();
             }
+        }
+        void IsDoneTakingCards()
+        {
+            for (int j=0;j<3;j++)
+            {
+                int id = ReciveInt();//gets the id of the player who has finished taking his cards
+
+                for (int i = 0; i < 3; i++)
+                {
+                    Controls.Remove(frishcards[id, i]);
+                    frishcards[id, i] = null;
+                }
+            }
+           
+        }
+        void PlaceFrishCards(object sender,EventArgs args)
+        {
+            Label label = (Label)sender;
+            label.Click -= PlaceFrishCards;
+
+            Card card = (Card)label.Tag;
+
+            SendCard(card);
+
+            int index = ReciveInt();
+
+            visHand.Add(label);
+            
+            for (int i = visHand.Count - 1; i > index; i--)
+            {
+                visHand[i] = visHand[i - 1];
+                visHand[i].Location = new Point(visHand[i].Location.X + visHand[i].Size.Width / 2, visHand[i].Location.Y);
+            }
+            visHand[index] = label;
+            for (int i = 0; i < index; i++)
+            {
+                visHand[i].Location = new Point(visHand[i].Location.X - visHand[i].Size.Width / 2, visHand[i].Location.Y);
+            }
+            visHand[index].Location = new Point(visHand[0].Location.X + index * visHand[0].Size.Width, visHand[0].Location.Y);
         }
         void PlaceNames()
         {
@@ -442,6 +484,11 @@ namespace WhistCilent
                 othersbets = othersbets.Substring(len + 1);
             }
         }
+        void SendCard(Card card)
+        {
+            byte[] data = Card.Serialize(card);
+            stream.Write(data, 0, data.Length);
+        }
         public Image Resize(Image image, int w, int h)
         {
             Bitmap bmp = new Bitmap(w, h);
@@ -468,7 +515,12 @@ namespace WhistCilent
             }
             return false;
         }
-
+        public int ReciveInt()
+        {
+            byte[] buffer = new byte[1];
+            stream.Read(buffer, 0, 1);
+            return (int)buffer[0];
+        }
         private void WhistClient_Load(object sender, EventArgs e)
         {
 
