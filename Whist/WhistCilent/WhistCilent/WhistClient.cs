@@ -33,8 +33,11 @@ namespace WhistCilent
         private Label[] thisround = new Label[4];
         private int firstturn;
         private Thread otherscards;
+        private Label thisturn;
         public WhistClient()
         {
+            this.FormClosed += (sender, e) => { Environment.Exit(Environment.ExitCode); };
+
             FormBorderStyle = FormBorderStyle.None;
             WindowState = FormWindowState.Maximized;
 
@@ -139,7 +142,7 @@ namespace WhistCilent
                 }
                 else
                 {
-                    choosetrump[i].Font = new Font("Ariel", 14);
+                    choosetrump[i].Font = new Font("Arial", 7 * Width / 960); ;
                     choosetrump[i].Text = i == 4 ? "ללא שליט" : isafterfrish ? "משחק חדש" : "פריש";
                 }
                 choosetrump[i].Size = choosetrump[0].Image.Size;
@@ -183,7 +186,7 @@ namespace WhistCilent
                 for (int i = 0; i < 4; i++)
                 {
                     choosetrump[i] = new Button();
-                    choosetrump[i].Font = new Font("Ariel", 14);
+                    choosetrump[i].Font = new Font("Arial", 7 * Width / 960);
                     choosetrump[i].Text = i == 3 ? "You" : GetName(score[i].Text);
                     choosetrump[i].Size = new Size(Width / 20, Width / 20);
                     choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
@@ -212,7 +215,7 @@ namespace WhistCilent
             {
                 if (score[i] == '\n')
                 {
-                    return score.Substring(0, i + 1);
+                    return score.Substring(0, i );
                 }
             }
             return score;
@@ -409,8 +412,9 @@ namespace WhistCilent
 
                 score[i] = new Label();
                 score[i].Size = new Size(Width / 15, Height / 20);
-                score[i].Font = new Font("Ariel", 14);
+                score[i].Font = new Font("Arial", 7 * Width / 960);
                 score[i].Text = temp + '\n' + "Score: 0";
+                score[i].Tag = GetName(score[i].Text);
             }
             score[0].Location = new Point(0, Height / 2 - score[0].Size.Height / 2);
             score[1].Location = new Point(Width / 2 - score[1].Size.Width / 2, 0);
@@ -419,8 +423,9 @@ namespace WhistCilent
             score[3] = new Label();
             score[3].Size = new Size(Width / 15, Height / 20);
             score[3].Location = new Point(Width / 2 - score[3].Size.Width / 2, Height - (int)(0.6 * score[3].Size.Height));
-            score[3].Font = new Font("Ariel", 14);
+            score[3].Font = new Font("Arial", 7 * Width / 960);
             score[3].Text = "Score: 0";
+            score[3].Tag = GetName(score[3].Text);
             this.Invoke(new del(() =>
             {
                 for (int i = 0; i < 4; i++)
@@ -465,6 +470,11 @@ namespace WhistCilent
         }
         void StartGame()
         {
+            thisturn = new Label();
+            thisturn.Font = new Font("Arial", 7 * Width / 960);
+            thisturn.Location = new Point(Width / 2 - thisturn.Size.Width / 2, 2 * Height / 5);
+            Controls.Add(thisturn);
+
             firstturn = ReciveInt();
             currentturn = firstturn;
 
@@ -484,7 +494,8 @@ namespace WhistCilent
                 {
 
                 }
-
+                thisturn.Text = "It's " + (string)score[currentturn % 4].Tag + "'s turn.";
+                thisturn.Size = TextRenderer.MeasureText(thisturn.Text,thisturn.Font);
                 Card card = RecieveCard();
 
                 thisround[currentturn % 4] = new Label();
@@ -508,11 +519,7 @@ namespace WhistCilent
                     Controls.Add(thisround[currentturn % 4]);
                 }));
 
-
-
                 IsNextRound();
-
-
 
                 Thread.Sleep(100);
             }
@@ -538,15 +545,14 @@ namespace WhistCilent
             {
                 currentturn++;
             }
-
-
-
         }
 
         void ChoseCard(object sender, EventArgs args)
         {
             if (currentturn == 3)
             {
+                thisturn.Text = "It's " + (string)score[3].Tag + "'s turn.";
+                thisturn.Size = TextRenderer.MeasureText(thisturn.Text, thisturn.Font);
 
                 Label card = (Label)sender;
                 NewPosition(card);
