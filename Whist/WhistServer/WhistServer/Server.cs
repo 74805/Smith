@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -105,14 +106,14 @@ namespace WhistServer
             }
             else
             {
-                if (trump < 5)
+                if (trump == 6)
                 {
-
-                    GetAndSendBets();
+                    NewGame();
                 }
                 else
                 {
-                    NewGame();
+                    
+                    GetAndSendBets();
                 }
             }
         }
@@ -192,14 +193,7 @@ namespace WhistServer
         {
             clients[clientid].stream.Write(new byte[1] { (byte)num }, 0, 1);
         }
-        Card RecieveCard(int clientid)
-        {
-            byte[] data = new byte[8];
-            clients[clientid].stream.Read(data, 0, data.Length);
-
-            Card card = Card.Desserialize(data);
-            return card;
-        }
+       
         void GetAndSendBets()
         {
             for (int i = 0; i < 4; i++)
@@ -219,6 +213,38 @@ namespace WhistServer
                 data = Encoding.UTF8.GetBytes(bets);
                 clients[i].stream.Write(data, 0, data.Length);
             }
+            StartGame();
+        }
+        void StartGame()
+        {
+            int firstplayer = trump % 10;
+            trump = trump / 10;
+            for (int i = 0; i < 13; i++)//13 rounds of game
+            {
+                Card[] thisround = new Card[4];
+                for (int j = 0; j < 4; j++)
+                {
+                    SendInt((firstplayer+4-j-1)%4, j);//send the firstplayer when a new round starts
+                }
+
+                for (int j = firstplayer; j < firstplayer + 4; j++)//one turn to each player
+                {
+                    thisround[j % 4] = RecieveCard(j % 4);
+
+                    for (int k = j % 4+1 ; k < j % 4 +4; k++)
+                    {
+                        SendCard(thisround[j % 4], k % 4);
+                    }
+                }
+            }
+        }
+        Card RecieveCard(int clientid)
+        {
+            byte[] data = new byte[8];
+            clients[clientid].stream.Read(data, 0, data.Length);
+
+            Card card = Card.Desserialize(data);
+            return card;
         }
         int BackSlash0(string mes)
         {
@@ -245,6 +271,11 @@ namespace WhistServer
             byte[] buffer = new byte[1];
             clients[clientid].stream.Read(buffer, 0, 1);
             return (int)buffer[0];
+        }
+        void SendCard(Card card,int clientid)
+        {
+            byte[] data = Card.Serialize(card);
+            clients[clientid].stream.Write(data);
         }
         void DontCloseServer()
         {

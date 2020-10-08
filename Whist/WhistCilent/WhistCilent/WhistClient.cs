@@ -29,6 +29,10 @@ namespace WhistCilent
         private Label[] score;
         private Button[] choosetrump;
         private Label[,] frishcards;
+        private int currentturn;
+        private Label[] thisround = new Label[4];
+        private int firstturn;
+        private Thread otherscards;
         public WhistClient()
         {
             FormBorderStyle = FormBorderStyle.None;
@@ -136,7 +140,7 @@ namespace WhistCilent
                 else
                 {
                     choosetrump[i].Font = new Font("Ariel", 14);
-                    choosetrump[i].Text = i == 4 ? "ללא שליט" :isafterfrish? "משחק חדש": "פריש";
+                    choosetrump[i].Text = i == 4 ? "ללא שליט" : isafterfrish ? "משחק חדש" : "פריש";
                 }
                 choosetrump[i].Size = choosetrump[0].Image.Size;
                 choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
@@ -167,13 +171,13 @@ namespace WhistCilent
             {
                 Controls.Remove(choosetrump[i]);
             }
-            if (send == 5|| send == 6)
+            if (send == 5 || send == 6)
             {
                 SendInt(send);
             }
             else
             {
-               
+
                 choosetrump = new Button[4];
 
                 for (int i = 0; i < 4; i++)
@@ -236,7 +240,7 @@ namespace WhistCilent
                     NewPosition(card);
                     frishcards[0, i].Image = othercards[0][0].Image;
                     frishcards[0, i].Size = othercards[0][0].Size;
-                    frishcards[0, i].Location = new Point(Width / 5, Height / 2 + (2*i - 3) * card.Size.Height / 2);
+                    frishcards[0, i].Location = new Point(Width / 5, Height / 2 + (2 * i - 3) * card.Size.Height / 2);
                     visHand.Remove(card);
 
                     if (i == 2)
@@ -273,11 +277,11 @@ namespace WhistCilent
                     frishcards[3, j].Image = Resize(image, visHand[0].Size.Width, visHand[0].Size.Height);
                     frishcards[3, j].Size = visHand[0].Size;
                     frishcards[3, j].Tag = getfrishcards[j];
-                    frishcards[3, j].Location = new Point(Width / 2 + (j*2 - 3) * (frishcards[3, j].Size.Width / 2), 3 * Height / 5);
+                    frishcards[3, j].Location = new Point(Width / 2 + (j * 2 - 3) * (frishcards[3, j].Size.Width / 2), 3 * Height / 5);
                     frishcards[3, j].Click += PlaceFrishCards;
                     this.Invoke(new del(() =>
                     {
-                    Controls.Add(frishcards[3, j]);
+                        Controls.Add(frishcards[3, j]);
                     }));
 
                     for (int i = 1; i < 3; i++)
@@ -288,7 +292,7 @@ namespace WhistCilent
 
                     }
                     frishcards[1, j].Location = new Point(Width / 2 + (2 * j - 3) * (frishcards[1, j].Size.Width / 2), Height / 6);
-                    frishcards[2, j].Location = new Point(4 * Width / 5, Height / 2 + (2 * j - 3) * frishcards[2,j].Size.Height / 2);
+                    frishcards[2, j].Location = new Point(4 * Width / 5, Height / 2 + (2 * j - 3) * frishcards[2, j].Size.Height / 2);
                     this.Invoke(new del(() =>
                     {
                         Controls.Add(frishcards[3, j]);
@@ -297,7 +301,7 @@ namespace WhistCilent
                     }));
                 }
 
-                
+
             }
         }
         void IsDoneTakingCards()
@@ -305,7 +309,7 @@ namespace WhistCilent
             byte[] data = new byte[1];
             stream.Read(data, 0, data.Length);
 
-            for (int j=0;j<3;j++)
+            for (int j = 0; j < 3; j++)
             {
                 for (int i = 0; i < 3; i++)
                 {
@@ -319,11 +323,12 @@ namespace WhistCilent
             {
                 GetTrump(true);
             }
-            Thread thread = new Thread(NewGameOrStartGame);
+
+            Thread thread = new Thread(NewGameOrGetBet);
             thread.Start();
-           
+
         }
-        void NewGameOrStartGame()
+        void NewGameOrGetBet()
         {
             byte[] data1 = new byte[1];
             stream.Read(data1, 0, data1.Length);
@@ -339,7 +344,7 @@ namespace WhistCilent
                 GetBet();
             }
         }
-        void PlaceFrishCards(object sender,EventArgs args)
+        void PlaceFrishCards(object sender, EventArgs args)
         {
             Label label = (Label)sender;
             label.Click -= PlaceFrishCards;
@@ -351,7 +356,7 @@ namespace WhistCilent
             int index = ReciveInt();
 
             visHand.Add(label);
-            
+
             for (int i = visHand.Count - 1; i > index; i--)
             {
                 visHand[i] = visHand[i - 1];
@@ -458,6 +463,103 @@ namespace WhistCilent
                 }));
             }
         }
+        void StartGame()
+        {
+            firstturn = ReciveInt();
+            currentturn = firstturn;
+
+            foreach (Label label in visHand)
+            {
+                label.Click += ChoseCard;
+            }
+
+            otherscards = new Thread(GetOtherCard);
+            otherscards.Start();
+        }
+        void GetOtherCard()
+        {
+            while (true)
+            {
+                while (currentturn == 3)
+                {
+
+                }
+
+                Card card = RecieveCard();
+
+                thisround[currentturn % 4] = new Label();
+                Image image = (Image)Properties.Resources.ResourceManager.GetObject(card.GetNum().ToString() + ((int)card.GetShape()).ToString());
+
+                if (currentturn % 4 != 1)
+                {
+                    image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    thisround[currentturn % 4].Image = Resize(image, (int)(this.Height / 7.1591), (int)(this.Width / 19.45));
+                    thisround[currentturn % 4].Location = new Point((int)((1.25 + currentturn % 4) * (Width / 4)), Height / 2 - thisround[currentturn % 4].Image.Size.Height / 2);
+                }
+                else
+                {
+                    thisround[currentturn % 4].Image = Resize(image, (int)(this.Width / 19.45), (int)(this.Height / 7.1591));
+                    thisround[currentturn % 4].Location = new Point(Width / 2 - thisround[currentturn % 4].Image.Size.Width / 2, Height / 4);
+                }
+                thisround[currentturn % 4].Size = thisround[currentturn % 4].Image.Size;
+                thisround[currentturn % 4].Tag = card;
+                this.Invoke(new del(() =>
+                {
+                    Controls.Add(thisround[currentturn % 4]);
+                }));
+
+
+
+                IsNextRound();
+
+
+
+                Thread.Sleep(100);
+            }
+        }
+        void IsNextRound()
+        {
+            if (currentturn == firstturn + 3)
+            {
+                this.Invoke(new del(() =>
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Controls.Remove(thisround[i]);
+                    }
+                }));
+                
+                thisround = new Label[4];
+
+                firstturn = ReciveInt();
+                currentturn = firstturn;
+            }
+            else
+            {
+                currentturn++;
+            }
+
+
+
+        }
+
+        void ChoseCard(object sender, EventArgs args)
+        {
+            if (currentturn == 3)
+            {
+
+                Label card = (Label)sender;
+                NewPosition(card);
+                card.Location = new Point(Width / 2 - card.Size.Width / 2, 3 * Height / 5);
+
+                visHand.Remove(card);
+                thisround[3] = card;
+                SendCard((Card)card.Tag);
+
+                IsNextRound();
+
+            }
+        }
         void NewPosition(Label card)
         {
             foreach (Label label in visHand)
@@ -471,7 +573,6 @@ namespace WhistCilent
                     label.Location = new Point(label.Location.X - label.Size.Width / 2, label.Location.Y);
                 }
             }
-
         }
         void SendCardArr(Card[] cards)
         {
@@ -517,6 +618,15 @@ namespace WhistCilent
                 score[i].Text += "/" + bets[i];
                 othersbets = othersbets.Substring(len + 1);
             }
+
+            StartGame();
+        }
+        Card RecieveCard()
+        {
+            byte[] data = new byte[8];
+            stream.Read(data, 0, data.Length);
+
+            return Card.Desserialize(data);
         }
         void SendCard(Card card)
         {
