@@ -34,6 +34,7 @@ namespace WhistCilent
         private int firstturn;
         private Thread otherscards;
         private Label thisturn;
+        private Button win;
         public WhistClient()
         {
             this.FormClosed += (sender, e) => { Environment.Exit(Environment.ExitCode); };
@@ -340,7 +341,7 @@ namespace WhistCilent
 
             if (isnewgame == 'c')
             {
-                NewGame();
+                NewGame("",new EventArgs());
             }
             else
             {
@@ -470,9 +471,14 @@ namespace WhistCilent
         }
         void StartGame()
         {
+            win = new Button();
+            win.Font= new Font("Arial", 7 * Width / 960);
+            win.Text = "Next Round";
+            win.Size = new Size(5 * Width / 96, 5 * Height / 54);
+            win.Location = new Point(Width / 2 - win.Size.Width / 2, 4 * Height / 9);
+
             thisturn = new Label();
             thisturn.Font = new Font("Arial", 7 * Width / 960);
-            thisturn.Location = new Point(Width / 2 - thisturn.Size.Width / 2, 2 * Height / 5);
             Controls.Add(thisturn);
 
             firstturn = ReciveInt();
@@ -490,12 +496,28 @@ namespace WhistCilent
         {
             while (true)
             {
+                bool flag = true;
                 while (currentturn == 3)
                 {
-
+                    if (flag)
+                    {
+                        this.Invoke(new del(() =>
+                        {
+                            thisturn.Text = "It's your turn.";
+                            thisturn.Size = TextRenderer.MeasureText(thisturn.Text, thisturn.Font);
+                            thisturn.Location = new Point(Width / 2 - thisturn.Size.Width / 2, 2 * Height / 5);
+                        }));
+                        
+                    }
+                    flag = false;
                 }
-                thisturn.Text = "It's " + (string)score[currentturn % 4].Tag + "'s turn.";
-                thisturn.Size = TextRenderer.MeasureText(thisturn.Text,thisturn.Font);
+                this.Invoke(new del(() =>
+                {
+                    thisturn.Text = "It's " + (string)score[currentturn % 4].Tag + "'s turn.";
+                    thisturn.Size = TextRenderer.MeasureText(thisturn.Text, thisturn.Font);
+                    thisturn.Location = new Point(Width / 2 - thisturn.Size.Width / 2, 2 * Height / 5);
+                }));
+               
                 Card card = RecieveCard();
 
                 thisround[currentturn % 4] = new Label();
@@ -505,7 +527,7 @@ namespace WhistCilent
                 {
                     image.RotateFlip(RotateFlipType.Rotate90FlipNone);
                     thisround[currentturn % 4].Image = Resize(image, (int)(this.Height / 7.1591), (int)(this.Width / 19.45));
-                    thisround[currentturn % 4].Location = new Point((int)((1.25 + currentturn % 4) * (Width / 4)), Height / 2 - thisround[currentturn % 4].Image.Size.Height / 2);
+                    thisround[currentturn % 4].Location = new Point((currentturn % 4==0?(5 * (Width / 16)):(11*Width/16-thisround[2].Size.Width)), Height / 2 - thisround[currentturn % 4].Image.Size.Height / 2);
                 }
                 else
                 {
@@ -528,6 +550,23 @@ namespace WhistCilent
         {
             if (currentturn == firstturn + 3)
             {
+                thisturn.Text = "";
+
+                int winner = ReciveInt();
+                string score1 = score[winner].Text;
+                score[winner].Text = score1.Substring(0, score1.Length - 3) + ((int)score1[score1.Length - 3] - 47).ToString() + score1.Substring(score1.Length - 2, 2);
+                if (winner == 3)//You win yes?
+                {
+                    if (visHand.Count == 0)
+                    {
+                        win.Text = "New Game";
+                        win.Click += NewGame;
+                    }
+                    this.Invoke(new del(() =>
+                    {
+                        Controls.Add(win);
+                    }));
+                }
                 this.Invoke(new del(() =>
                 {
                     for (int i = 0; i < 4; i++)
@@ -551,18 +590,26 @@ namespace WhistCilent
         {
             if (currentturn == 3)
             {
-                thisturn.Text = "It's " + (string)score[3].Tag + "'s turn.";
-                thisturn.Size = TextRenderer.MeasureText(thisturn.Text, thisturn.Font);
+               
+                Label card = (Label)sender; 
 
-                Label card = (Label)sender;
-                NewPosition(card);
-                card.Location = new Point(Width / 2 - card.Size.Width / 2, 3 * Height / 5);
-
-                visHand.Remove(card);
-                thisround[3] = card;
                 SendCard((Card)card.Tag);
 
-                IsNextRound();
+                byte[] data = new byte[1];
+                stream.Read(data, 0, 1);
+
+                if (Encoding.UTF8.GetString(data)=="a")
+                {
+                    NewPosition(card);
+                    card.Location = new Point(Width / 2 - card.Size.Width / 2, 3 * Height / 5);
+
+                    visHand.Remove(card);
+                    thisround[3] = card;
+
+
+                    IsNextRound();
+                }
+                
 
             }
         }
@@ -648,7 +695,7 @@ namespace WhistCilent
 
             return bmp;
         }
-        void NewGame()
+        void NewGame(object sender,EventArgs args)
         {
 
         }

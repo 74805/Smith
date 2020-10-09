@@ -127,7 +127,7 @@ namespace WhistServer
             }
             return result;
         }
-      
+        
         public int CompareTo(object obj)
         {
             Card other = obj as Card;

@@ -19,6 +19,8 @@ namespace WhistServer
         private List<Card>[] pcards = new List<Card>[4];
         private string[] names = new string[4];
         private int trump;
+        private Card[] thisround;
+        private int firstplayer;
         public Server()
         {
             Packet packet = new Packet();
@@ -217,11 +219,11 @@ namespace WhistServer
         }
         void StartGame()
         {
-            int firstplayer = trump % 10;
+            firstplayer = trump % 10;
             trump = trump / 10;
             for (int i = 0; i < 13; i++)//13 rounds of game
             {
-                Card[] thisround = new Card[4];
+                thisround = new Card[4];
                 for (int j = 0; j < 4; j++)
                 {
                     SendInt((firstplayer+4-j-1)%4, j);//send the firstplayer when a new round starts
@@ -229,14 +231,90 @@ namespace WhistServer
 
                 for (int j = firstplayer; j < firstplayer + 4; j++)//one turn to each player
                 {
-                    thisround[j % 4] = RecieveCard(j % 4);
+                    while (true)
+                    {
+                        thisround[j % 4] = RecieveCard(j % 4);
+
+                        if (IsValid(thisround[j % 4], j % 4))
+                        {
+                            RemoveCard(thisround[j % 4], j % 4);
+                            clients[j % 4].stream.Write(Encoding.UTF8.GetBytes("a"));
+                            break;
+                        }
+                        else
+                        {
+                            clients[j % 4].stream.Write(Encoding.UTF8.GetBytes("b"));
+                        }
+                    }
 
                     for (int k = j % 4+1 ; k < j % 4 +4; k++)
                     {
                         SendCard(thisround[j % 4], k % 4);
                     }
                 }
+                int winner = GetWinner(thisround);
+
+                for (int j = 0; j < 4; j++)
+                {
+                    SendInt((winner + 4 - j - 1) % 4, j);//send the winner when a round ends
+                }
             }
+        }
+        int GetWinner(Card[] cards)
+        {
+            int max = 0;
+
+            for (int i = 1; i < 4; i++)
+            {
+                if (cards[i].GetShape() == cards[max].GetShape())
+                {
+                    if (cards[i].GetNum() > cards[max].GetNum())
+                    {
+                        max = i;
+                        continue;
+                    }
+                    continue;
+                }
+                if ((int)cards[i].GetShape() == trump && (int)cards[max].GetShape() != trump)
+                {
+                    max = i;
+                    continue;
+                }
+                if ((int)cards[i].GetShape() != trump && (int)cards[max].GetShape() == trump)
+                {
+                    continue;
+                }
+            }
+            return max;
+        }
+        void RemoveCard(Card card,int id)
+        {
+            foreach (Card card1 in pcards[id])
+            {
+                if (card1.GetShape()==card.GetShape()&& card1.GetNum() == card.GetNum())
+                {
+                    pcards[id].Remove(card1);
+                    return;
+                }
+            }
+        }
+        bool IsValid(Card card, int clientid)
+        {
+
+            Card first = thisround[firstplayer];
+
+            if (card.GetShape() == first.GetShape())
+            {
+                return true;
+            }
+            foreach (Card card1 in pcards[clientid])
+            {
+                if (card1.GetShape() == first.GetShape())
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         Card RecieveCard(int clientid)
         {
@@ -277,18 +355,7 @@ namespace WhistServer
             byte[] data = Card.Serialize(card);
             clients[clientid].stream.Write(data);
         }
-        void DontCloseServer()
-        {
-            Thread thread = new Thread(DontCloseServer1);
-            thread.Start();
-        }
-        void DontCloseServer1()
-        {
-            while (true)
-            {
-                Thread.Sleep(1000000);
-            }
-        }
+    
         Card[] RecieveCardArr(int length, int clientid)
         {
             byte[] data = new byte[8 * length];
