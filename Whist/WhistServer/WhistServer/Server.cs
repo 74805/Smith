@@ -220,14 +220,16 @@ namespace WhistServer
         void StartGame()
         {
             firstplayer = trump % 10;
-            trump = trump / 10;
+            trump = trump / 10; 
+
+            for (int j = 0; j < 4; j++)
+            {
+                SendInt((firstplayer + 4 - j - 1) % 4, j);//send the firstplayer when a new round starts
+            }
+
             for (int i = 0; i < 13; i++)//13 rounds of game
             {
                 thisround = new Card[4];
-                for (int j = 0; j < 4; j++)
-                {
-                    SendInt((firstplayer+4-j-1)%4, j);//send the firstplayer when a new round starts
-                }
 
                 for (int j = firstplayer; j < firstplayer + 4; j++)//one turn to each player
                 {
@@ -252,11 +254,19 @@ namespace WhistServer
                         SendCard(thisround[j % 4], k % 4);
                     }
                 }
-                int winner = GetWinner(thisround);
+                firstplayer = GetWinner(thisround);
 
                 for (int j = 0; j < 4; j++)
                 {
-                    SendInt((winner + 4 - j - 1) % 4, j);//send the winner when a round ends
+                    SendInt((firstplayer + 4 - j - 1) % 4, j);//send the winner when a round ends
+                }
+
+                byte[] data = new byte[1];
+                clients[firstplayer].stream.Read(data, 0, 1);
+
+                for (int j = firstplayer + 1; j < firstplayer + 4; j++)
+                {
+                    clients[j % 4].stream.Write(new byte[] { 0 }, 0, 1);
                 }
             }
         }
