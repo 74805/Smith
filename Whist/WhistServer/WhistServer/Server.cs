@@ -14,7 +14,6 @@ namespace WhistServer
     class Server
     {
         private TcpListener listener;
-        private Thread waitforclients;
         private Client[] clients = new Client[4];
         private List<Card>[] pcards = new List<Card>[4];
         private string[] names = new string[4];
@@ -23,21 +22,36 @@ namespace WhistServer
         private int firstplayer;
         public Server()
         {
+            listener = new TcpListener(IPAddress.Any, 7986);
+            listener.Start();
+
+            StartServer(true);
+        }
+        void StartServer(bool isfirstgame)
+        {
             Packet packet = new Packet();
             packet.Shuffle();
 
             Card[][] pcards = packet.GetPcards();
 
             int a = (int)pcards[0][3].GetShape();
-            listener = new TcpListener(IPAddress.Any, 7986);
-            listener.Start();
-
+           
             for (int i = 0; i < 4; i++)
             {
                 this.pcards[i] = pcards[i].ToList();
             }
-
-            WaitForClient();
+            if (isfirstgame)
+            {
+                WaitForClient();
+            }
+            else
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    clients[i].stream.Write(Card.SerializeArr(pcards[i].ToArray()));
+                }
+                GetTrump();
+            }
         }
         void WaitForClient()
         {
@@ -190,6 +204,7 @@ namespace WhistServer
         void NewGame()//start a new game
         {
 
+            StartServer(false);
         }
         public void SendInt(int num,int clientid)
         {
@@ -261,14 +276,27 @@ namespace WhistServer
                     SendInt((firstplayer + 4 - j - 1) % 4, j);//send the winner when a round ends
                 }
 
-                byte[] data = new byte[1];
-                clients[firstplayer].stream.Read(data, 0, 1);
-
-                for (int j = firstplayer + 1; j < firstplayer + 4; j++)
+                if (i < 12)
                 {
-                    clients[j % 4].stream.Write(new byte[] { 0 }, 0, 1);
+                    byte[] data = new byte[1];
+                    clients[firstplayer].stream.Read(data, 0, 1);
+
+                    for (int j = firstplayer + 1; j < firstplayer + 4; j++)
+                    {
+                        clients[j % 4].stream.Write(new byte[] { 0 }, 0, 1);
+                    }
                 }
             }
+            byte[] data1 = new byte[1];
+            clients[firstplayer].stream.Read(data1, 0, 1);
+
+            for (int i = firstplayer + 1; i < firstplayer + 4; i++)
+            {
+                clients[i % 4].stream.Write(Encoding.UTF8.GetBytes("a"),0,1);
+            }
+
+            NewGame();
+
         }
         int GetWinner(Card[] cards)
         {
