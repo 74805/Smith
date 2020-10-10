@@ -124,7 +124,7 @@ namespace WhistServer
             {
                 if (trump == 6)
                 {
-                    NewGame();
+                    StartServer(false);//New Game
                 }
                 else
                 {
@@ -201,11 +201,7 @@ namespace WhistServer
                 }
             }
         }
-        void NewGame()//start a new game
-        {
 
-            StartServer(false);
-        }
         public void SendInt(int num,int clientid)
         {
             clients[clientid].stream.Write(new byte[1] { (byte)num }, 0, 1);
@@ -295,7 +291,7 @@ namespace WhistServer
                 clients[i % 4].stream.Write(Encoding.UTF8.GetBytes("a"),0,1);
             }
 
-            NewGame();
+            StartServer(false);//New Game
 
         }
         int GetWinner(Card[] cards)

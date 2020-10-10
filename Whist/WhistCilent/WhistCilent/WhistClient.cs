@@ -266,7 +266,6 @@ namespace WhistCilent
                     break;
                 }
 
-
             }
             void GetFrishCards()
             {
@@ -327,7 +326,10 @@ namespace WhistCilent
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    Controls.Remove(frishcards[j, i]);
+                    this.Invoke(new del(() =>
+                    {
+                        Controls.Remove(frishcards[j, i]);
+                    }));
                     frishcards[j, i] = null;
                 }
             }
@@ -369,7 +371,7 @@ namespace WhistCilent
 
             int index = ReciveInt();
 
-            visHand.Add(label);
+            visHand.Add(new Label());
 
             for (int i = visHand.Count - 1; i > index; i--)
             {
@@ -381,11 +383,12 @@ namespace WhistCilent
             {
                 visHand[i].Location = new Point(visHand[i].Location.X - visHand[i].Size.Width / 2, visHand[i].Location.Y);
             }
-            visHand[index].Location = new Point(visHand[0].Location.X + index * visHand[0].Size.Width, visHand[0].Location.Y);
+            visHand[index].Location = index != 0 ? (new Point((visHand[0].Location.X + index * visHand[0].Size.Width), visHand[0].Location.Y)) : new Point(visHand[1].Location.X - visHand[1].Size.Width, visHand[1].Location.Y);
 
             if (visHand.Count == 13)
             {
-                IsDoneTakingCards();
+                Thread thread = new Thread(IsDoneTakingCards);
+                thread.Start();
             }
         }
         void PlaceNames()
