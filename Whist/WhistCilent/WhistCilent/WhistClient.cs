@@ -36,6 +36,7 @@ namespace WhistCilent
         private Label thisturn;
         private Button win;
         private Thread nextound;
+        private bool cardenable;
         public WhistClient()
         {
             this.FormClosed += (sender, e) => { Environment.Exit(Environment.ExitCode); };
@@ -46,12 +47,14 @@ namespace WhistCilent
             this.Height = Screen.PrimaryScreen.Bounds.Height;
             this.Width = Screen.PrimaryScreen.Bounds.Width;
 
-            client = new TcpClient("213.57.202.58", 7986);
+            client = new TcpClient("localhost", 7986);
             stream = client.GetStream();
 
+            cardenable = true;
+            
             byte[] data = Encoding.UTF8.GetBytes(Environment.UserName); //save the user name string in bytes array
             stream.Write(data, 0, data.Length); //send the data array
-
+            
             Shown += CreateCards;//creating a visual form of the cards
         }
         void CreateCards(object sender, EventArgs args)
@@ -59,7 +62,7 @@ namespace WhistCilent
             byte[] data1 = new byte[104];
             stream.Read(data1, 0, data1.Length); //receive the cards from the server
 
-            Card[] temp = Card.DesserializeArr(data1); //parse the cards that has been recived
+            Card[] temp = Card.DesserializeArr(data1); //parse the cards that has been Received
             hand = temp.ToList(); //create List of Cards from the Card array
 
             Thread thread;
@@ -134,13 +137,10 @@ namespace WhistCilent
                         othercards[j].Add(label1);
                     }
                 }
-
             }
-
         }
         void GetTrump(bool isafterfrish)
         {
-
             choosetrump = new Button[6];
 
             for (int i = 0; i < 6; i++)
@@ -369,7 +369,7 @@ namespace WhistCilent
 
             SendCard(card);
 
-            int index = ReciveInt();
+            int index = ReceiveInt();
 
             visHand.Add(new Label());
 
@@ -502,7 +502,7 @@ namespace WhistCilent
             thisturn.Font = new Font("Arial", 7 * Width / 960);
             Controls.Add(thisturn);
 
-            firstturn = ReciveInt();
+            firstturn = ReceiveInt();
             currentturn = firstturn;
 
             foreach (Label label in visHand)
@@ -570,7 +570,7 @@ namespace WhistCilent
         }
         void NextRound()
         {
-            int winner = ReciveInt();
+            int winner = ReceiveInt();
 
             win.Tag = winner;
 
@@ -587,7 +587,14 @@ namespace WhistCilent
 
             this.Invoke(new del(() =>
             {
-                thisturn.Text = (string)score[winner].Tag + " is the winner!";
+                if (winner == 3)
+                {
+                    thisturn.Text = "You are the winner!";
+                }
+                else
+                {
+                    thisturn.Text = (string)score[winner].Tag + " is the winner!";
+                }
                 thisturn.Size = TextRenderer.MeasureText(thisturn.Text, thisturn.Font);
                 thisturn.Location = new Point(Width / 2 - thisturn.Size.Width / 2, 2 * Height / 5);
 
@@ -626,7 +633,7 @@ namespace WhistCilent
 
         void ChoseCard(object sender, EventArgs args)
         {
-            if (currentturn == 3)
+            if (currentturn == 3 && cardenable)
             {
                 Label card = (Label)sender;
 
@@ -637,6 +644,7 @@ namespace WhistCilent
 
                 if (Encoding.UTF8.GetString(data) == "a")
                 {
+                    cardenable = false;
                     NewPosition(card);
                     card.Location = new Point(Width / 2 - card.Size.Width / 2, 3 * Height / 5);
 
@@ -688,6 +696,7 @@ namespace WhistCilent
 
                 firstturn = (int)winner;
                 currentturn = firstturn;
+                cardenable = true;
 
                 otherscards.Abort();
                 otherscards = new Thread(GetOtherCard);
@@ -701,6 +710,8 @@ namespace WhistCilent
         }
         void WinnerClick(object sender, EventArgs args)
         {
+            cardenable = true;
+
             Button win = (Button)sender;
 
             stream.Write(new byte[] { 0 }, 0, 1);
@@ -859,7 +870,7 @@ namespace WhistCilent
             }
             return false;
         }
-        public int ReciveInt()
+        public int ReceiveInt()
         {
             byte[] buffer = new byte[1];
             stream.Read(buffer, 0, 1);

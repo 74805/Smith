@@ -1,0 +1,18 @@
+D:\יובל\Desktop-Minigames\ChatServer\ChatServer\bin\Debug\ChatServer.exe.config
+D:\יובל\Desktop-Minigames\ChatServer\ChatServer\bin\Debug\ChatServer.exe
+D:\יובל\Desktop-Minigames\ChatServer\ChatServer\bin\Debug\ChatServer.pdb
+D:\יובל\Desktop-Minigames\ChatServer\ChatServer\obj\Debug\ChatServer.csprojAssemblyReference.cache
+D:\יובל\Desktop-Minigames\ChatServer\ChatServer\obj\Debug\ChatServer.Properties.Resources.resources
+D:\יובל\Desktop-Minigames\ChatServer\ChatServer\obj\Debug\ChatServer.csproj.GenerateResource.cache
+D:\יובל\Desktop-Minigames\ChatServer\ChatServer\obj\Debug\ChatServer.csproj.CoreCompileInputs.cache
+D:\יובל\Desktop-Minigames\ChatServer\ChatServer\obj\Debug\ChatServer.exe
+D:\יובל\Desktop-Minigames\ChatServer\ChatServer\obj\Debug\ChatServer.pdb
+D:\יובל\Smith - Copy\ChatServer\ChatServer\bin\Debug\ChatServer.exe.config
+D:\יובל\Smith - Copy\ChatServer\ChatServer\bin\Debug\ChatServer.exe
+D:\יובל\Smith - Copy\ChatServer\ChatServer\bin\Debug\ChatServer.pdb
+D:\יובל\Smith - Copy\ChatServer\ChatServer\obj\Debug\ChatServer.csproj.AssemblyReference.cache
+D:\יובל\Smith - Copy\ChatServer\ChatServer\obj\Debug\ChatServer.Properties.Resources.resources
+D:\יובל\Smith - Copy\ChatServer\ChatServer\obj\Debug\ChatServer.csproj.GenerateResource.cache
+D:\יובל\Smith - Copy\ChatServer\ChatServer\obj\Debug\ChatServer.csproj.CoreCompileInputs.cache
+D:\יובל\Smith - Copy\ChatServer\ChatServer\obj\Debug\ChatServer.exe
+D:\יובל\Smith - Copy\ChatServer\ChatServer\obj\Debug\ChatServer.pdb

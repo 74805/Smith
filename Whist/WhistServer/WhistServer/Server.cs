@@ -91,7 +91,7 @@ namespace WhistServer
         }
         void GetTrump()
         {
-            trump = ReciveInt(0);
+            trump = ReceiveInt(0);
 
             byte[] data;
             bool isfrish = false;
@@ -211,7 +211,7 @@ namespace WhistServer
         {
             for (int i = 0; i < 4; i++)
             {
-                clients[i].bet = ReciveInt(i);
+                clients[i].bet = ReceiveInt(i);
             }
 
             byte[] data;
@@ -378,7 +378,7 @@ namespace WhistServer
                 return ms.ToArray();
             }
         }
-        public int ReciveInt(int clientid)
+        public int ReceiveInt(int clientid)
         {
             byte[] buffer = new byte[1];
             clients[clientid].stream.Read(buffer, 0, 1);
