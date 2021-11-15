@@ -296,26 +296,21 @@ namespace WhistServer
         }
         int GetWinner(Card[] cards)
         {
-            int max = 0;
+            int max = firstplayer;
 
-            for (int i = 1; i < 4; i++)
+            for (int i = firstplayer + 1; i < firstplayer + 4; i++) 
             {
-                if (cards[i].GetShape() == cards[max].GetShape())
+                if (cards[i%4].GetShape() == cards[max].GetShape())
                 {
-                    if (cards[i].GetNum() > cards[max].GetNum())
+                    if (cards[i % 4].GetNum() > cards[max].GetNum())
                     {
-                        max = i;
-                        continue;
+                        max = i % 4;
                     }
                     continue;
                 }
-                if ((int)cards[i].GetShape() == trump && (int)cards[max].GetShape() != trump)
+                if ((int)cards[i % 4].GetShape() == trump && (int)cards[max].GetShape() != trump)
                 {
-                    max = i;
-                    continue;
-                }
-                if ((int)cards[i].GetShape() != trump && (int)cards[max].GetShape() == trump)
-                {
+                    max = i % 4;
                     continue;
                 }
             }

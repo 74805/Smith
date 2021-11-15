@@ -37,6 +37,7 @@ namespace WhistCilent
         private Button win;
         private Thread nextound;
         private bool cardenable;
+        private ChatClient chatclient = null;
         public WhistClient()
         {
             this.FormClosed += (sender, e) => { Environment.Exit(Environment.ExitCode); };
@@ -47,16 +48,49 @@ namespace WhistCilent
             this.Height = Screen.PrimaryScreen.Bounds.Height;
             this.Width = Screen.PrimaryScreen.Bounds.Width;
 
-            client = new TcpClient("localhost", 7986);
+            Button chat = new Button();
+            chat.Text = "Open chat";
+            chat.Font = new Font("Arial", Height / 108);
+            chat.Location = new Point(0, 0);
+            chat.Size = new Size(Width / 20, Height / 30);
+            chat.Click += (object sender, EventArgs e) =>
+            {
+                try
+                {
+                    chatclient.BringToFront();
+                    chatclient.Show();
+                }
+                catch
+                {
+                    try
+                    {
+                        chatclient = new ChatClient();
+                        chatclient.Show();
+                        chatclient.BringToFront();
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Chat server does not currently work");
+                        if (chatclient != null)
+                        {
+                            chatclient.Close();
+                        }
+                    }
+                }
+            };
+            Controls.Add(chat);
+
+            client = new TcpClient("77.139.114.151", 7986);
             stream = client.GetStream();
 
             cardenable = true;
-            
+
             byte[] data = Encoding.UTF8.GetBytes(Environment.UserName); //save the user name string in bytes array
             stream.Write(data, 0, data.Length); //send the data array
-            
+
             Shown += CreateCards;//creating a visual form of the cards
         }
+
         void CreateCards(object sender, EventArgs args)
         {
             byte[] data1 = new byte[104];
@@ -834,7 +868,7 @@ namespace WhistCilent
                     if (i < 4)
                     {
 
-                        score[i].Text = (i!=3?(string)score[i].Tag + "\n":"")+"score: 0";
+                        score[i].Text = (i != 3 ? (string)score[i].Tag + "\n" : "") + "score: 0";
 
                         Controls.Remove(thisround[i]);
                     }

@@ -16,7 +16,21 @@ namespace WhistCilent
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new WhistClient());
+
+            WhistClient whistclient = null;
+            try
+            {
+                whistclient = new WhistClient();
+                Application.Run(whistclient);
+            }
+            catch
+            {
+                MessageBox.Show("Whist server does not currently work");
+                if (whistclient != null)
+                {
+                    whistclient.Close();
+                }
+            }
         }
     }
 }
