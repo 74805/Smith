@@ -16,10 +16,10 @@ namespace WhistServer
         private TcpListener listener;
         private Client[] clients = new Client[4];
         private List<Card>[] pcards = new List<Card>[4];
-        private string[] names = new string[4];
         private int trump;
         private Card[] thisround;
         private int firstplayer;
+        private int betstarterid = 0;
         public Server()
         {
             listener = new TcpListener(IPAddress.Any, 7986);
@@ -50,7 +50,7 @@ namespace WhistServer
                 {
                     clients[i].stream.Write(Card.SerializeArr(pcards[i].ToArray()));
                 }
-                GetTrump();
+                GetTrump(0);
             }
         }
         void WaitForClient()
@@ -63,9 +63,8 @@ namespace WhistServer
                 client.GetStream().Read(data, 0, data.Length);
 
                 string name = Encoding.ASCII.GetString(data);
-                names[i] = name.Substring(0, BackSlash0(name));
 
-                clients[i] = new Client(name, client, client.GetStream());
+                clients[i] = new Client(name.Substring(0, BackSlash0(name)), client, client.GetStream());
 
                 clients[i].stream.Write(Card.SerializeArr(pcards[i].ToArray()));
             }
@@ -75,7 +74,7 @@ namespace WhistServer
                 string sendnames = i.ToString();
                 for (int j = i + 1; j < i + 4; j++)
                 {
-                    sendnames += names[j % 4].Length.ToString() + names[j % 4];
+                    sendnames += clients[j % 4].name.Length.ToString() + clients[j % 4].name;
                 }
                 try
                 {
@@ -87,15 +86,50 @@ namespace WhistServer
 
                 }
             }
-            GetTrump();
+            GetTrump(0);
         }
-        void GetTrump()
+        void ClientBetTrump(int clientid, int bet)
         {
-            trump = ReceiveInt(0);
+            Card card = new Card(1, (CardEnum)(bet % 10));//to get the name of the shape (line 96)
+            for (int j = clientid % 4 + 1; j < clientid % 4 + 4; j++)//tell all clients what the client bet
+            {
+                Card tosend = new Card(bet / 10, (CardEnum)(bet % 10)); 
+                clients[j % 4].stream.Write(Encoding.UTF8.GetBytes(clients[clientid].name));
+                SendCard(tosend, j % 4);
+                
+            }
+
+            for (int i = clientid + 1; i < clientid + 4; i++) 
+            {
+                clients[i % 4].stream.Write(new byte[] { 0 });//send the client to make a bet on a trump
+                int newbet = ReceiveInt(i % 4);
+                if (newbet != 0)
+                {
+                    ClientBetTrump(i % 4, newbet);
+                    return;
+                }
+            }
+            trump = bet % 10;
+            
+        }
+        void GetTrump(int frishtimes)
+        {
+            trump = -1;
+            for (int i = betstarterid; i < betstarterid + 4; i++) 
+            {
+                clients[i % 4].stream.Write(new byte[] { 0 });//send the client to make a bet on a trump
+
+                int bet = ReceiveInt(i % 4);//0 is pass, otherwise last digit is trump and other digits are bet
+                if (bet != 0)
+                {
+                    ClientBetTrump(i % 4, bet);
+                    break;
+                }
+            }
 
             byte[] data;
             bool isfrish = false;
-            if (trump == 5)//frish
+            if (trump == -1 && frishtimes != 2)//frish
             {
                 isfrish = true;
                 data = Encoding.UTF8.GetBytes("a");//tell all clients that its frish
@@ -104,12 +138,11 @@ namespace WhistServer
             {
                 if (trump == 6)
                 {
-                    data = Encoding.UTF8.GetBytes("c");//tell all clients to start over the game
+                    data = Encoding.UTF8.GetBytes("c");//tell all clients to start over the game (frish third time)
                 }
                 else
                 {
                     data = Encoding.UTF8.GetBytes("b");//tell all clients to bet
-
                 }
             }
             for (int i = 0; i < 4; i++)
@@ -118,7 +151,7 @@ namespace WhistServer
             }
             if (isfrish)
             {
-                GetFrishCards();
+                GetFrishCards(frishtimes);
             }
             else
             {
@@ -134,7 +167,7 @@ namespace WhistServer
             }
         }
        
-        void GetFrishCards()
+        void GetFrishCards(int frishtimes)
         {
             Card[][] frishcards = new Card[4][];
             
@@ -176,7 +209,7 @@ namespace WhistServer
                 clients[i].stream.Write(new byte[] { 0 });
             }
             threads = null;
-            GetTrump();
+            GetTrump(frishtimes+1);
         }
         void SendIndex(object clientid)
         {

@@ -38,10 +38,12 @@ namespace WhistCilent
         private Thread nextound;
         private bool cardenable;
         private ChatClient chatclient = null;
+        private Label bettext;
+        private Card currenttopbet;
         public WhistClient()
         {
             this.FormClosed += (sender, e) => { Environment.Exit(Environment.ExitCode); };
-
+            
             FormBorderStyle = FormBorderStyle.None;
             WindowState = FormWindowState.Maximized;
 
@@ -57,7 +59,7 @@ namespace WhistCilent
             {
                 try
                 {
-                    chatclient.BringToFront();
+                    chatclient.BringToFront();//if the chat was opened and its closed now
                     chatclient.Show();
                 }
                 catch
@@ -97,20 +99,19 @@ namespace WhistCilent
             stream.Read(data1, 0, data1.Length); //receive the cards from the server
 
             Card[] temp = Card.DesserializeArr(data1); //parse the cards that has been Received
-            hand = temp.ToList(); //create List of Cards from the Card array
+            hand = temp.ToList(); //create list of cards from the card array
 
             Thread thread;
             try
             {
-                string a = (string)sender;
+                string a = (string)sender;//if sender is null then the form was just shown
                 thread = new Thread(BeforeGetBet);
-                //put names on screes yes?
             }
             catch
             {
                 thread = new Thread(PlaceNames);
+                //put names on screes
             }
-            hand = temp.ToList();
 
             thread.Start();
 
@@ -175,83 +176,85 @@ namespace WhistCilent
         }
         void GetTrump(bool isafterfrish)
         {
-            choosetrump = new Button[6];
+            choosetrump = new Button[10];//buttons of the bets
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < choosetrump.Length; i++)
             {
                 choosetrump[i] = new Button();
-                if (i < 4)
-                {
-                    Image image = (Image)Properties.Resources.ResourceManager.GetObject((10 + i).ToString());
-                    choosetrump[i].Image = Resize(image, (int)(0.055339 * Width), (int)(0.09838 * Height));
-                }
-                else
-                {
-                    choosetrump[i].Font = new Font("Arial", 7 * Width / 960); ;
-                    choosetrump[i].Text = i == 4 ? "ללא שליט" : isafterfrish ? "משחק חדש" : "פריש";
-                }
-                choosetrump[i].Size = choosetrump[0].Image.Size;
+                choosetrump[i].Font = new Font("Arial", 7 * Width / 960);
+                choosetrump[i].Size = new Size(Width / 20, Width / 20);
                 choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
-                if ((isafterfrish && i == 5))
+                choosetrump[i].Click += BetClick;
+                choosetrump[i].Tag = (i + 5);
+                if (i < 9)
                 {
-                    choosetrump[5].Tag = 6;
+                    choosetrump[i].Text = (i + 5).ToString();
                 }
                 else
                 {
-                    choosetrump[i].Tag = i;
+                    choosetrump[i].Text = "Pass";
                 }
-                choosetrump[i].Click += TrumpClick;
-
                 this.Invoke(new del(() =>
                 {
                     Controls.Add(choosetrump[i]);
                 }));
+
             }
-
         }
-        void TrumpClick(object sender, EventArgs args)
+        void BetClick(object sender, EventArgs args)
         {
-            Button trump = (Button)sender;
-
-            int send = (int)trump.Tag;
-
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < choosetrump.Length; i++) 
             {
                 Controls.Remove(choosetrump[i]);
             }
-            if (send == 5 || send == 6)
+
+            int bet = (int)((Button)sender).Tag;
+
+            if (bet != 14)
             {
-                SendInt(send);
+                choosetrump = new Button[5];
+
+                for (int i = 0; i < choosetrump.Length; i++)
+                {
+                    choosetrump[i] = new Button();
+
+                    if (i < 4)
+                    {
+                        Image image = (Image)Properties.Resources.ResourceManager.GetObject((10 + i).ToString());
+                        choosetrump[i].Image = Resize(image, (int)(0.055339 * Width), (int)(0.09838 * Height));
+                    }
+                    else
+                    {
+                        choosetrump[i].Font = new Font("Arial", 7 * Width / 960); ;
+                        choosetrump[i].Text = "ללא שליט";
+                    }
+                    choosetrump[i].Tag = i + bet * 10;
+                    choosetrump[i].Size = choosetrump[0].Image.Size;
+                    choosetrump[i].Location = new Point(Width / 2 - 5 * choosetrump[i].Size.Width / 2 - 2 * Width / 400 + i * (choosetrump[i].Size.Width + Width / 400), 4 * Height / 7);
+                    choosetrump[i].Click += FinishBet;
+                    Controls.Add(choosetrump[i]);
+                }
             }
             else
             {
-
-                choosetrump = new Button[4];
-
-                for (int i = 0; i < 4; i++)
-                {
-                    choosetrump[i] = new Button();
-                    choosetrump[i].Font = new Font("Arial", 7 * Width / 960);
-                    choosetrump[i].Text = i == 3 ? "You" : GetName(score[i].Text);
-                    choosetrump[i].Size = new Size(Width / 20, Width / 20);
-                    choosetrump[i].Location = new Point(Width / 2 + (i - choosetrump.Length / 2) * choosetrump[i].Size.Width, 4 * Height / 7);
-                    choosetrump[i].Tag = send * 10 + (1 + i + clientid) % 4;
-                    choosetrump[i].Click += FirstPlayerClick;
-                    Controls.Add(choosetrump[i]);
-
-                }
+                SendInt(0);
             }
         }
-        void FirstPlayerClick(object sender, EventArgs args)
+        void FinishBet(object sender, EventArgs args)
         {
-            Button firstplayer = (Button)sender;
+            int send = (int)((Button)sender).Tag;
 
-            int send = (int)firstplayer.Tag;
-
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < choosetrump.Length; i++)
             {
                 Controls.Remove(choosetrump[i]);
             }
+            Card card = new Card(1, (CardEnum)(send % 10));//to get the name of the shape (line 253)
+            this.Invoke(new del(() =>
+            {
+                bettext.Text = "You bet " + send / 10 + " if the trump is " + card.GetShape();
+                bettext.Size = TextRenderer.MeasureText(bettext.Text, bettext.Font);
+                bettext.Location = new Point(Width / 2 - bettext.Size.Width / 2, 2 * Height / 5);
+            }));
             SendInt(send);
         }
         string GetName(string score)
@@ -485,16 +488,46 @@ namespace WhistCilent
         }
         void BeforeGetBet()
         {
-            if (clientid == 0)
+            bettext = new Label();
+            bettext.Font = new Font("Arial", 7 * Width / 960);
+            bettext.Text = "";
+            this.Invoke(new del(() =>
             {
-                GetTrump(false);
+                Controls.Add(bettext);
+            }));
+           
+
+            byte[] data = new byte[256]; 
+            stream.Read(data, 0, 256);
+            string clientname = Encoding.UTF8.GetString(data);
+
+            while (clientname[0] != 'a' && clientname[0] != 'b' && clientname[0] != 'c') 
+            {
+                if (clientname[0] != '\0') //if someone had bet for a trump
+                {
+                    currenttopbet = ReceiveCard();//when data is received the client needs to make a bet (or pass) or if its a card it means that someone had bet
+                    this.Invoke(new del(() =>
+                    {
+                        bettext.Text = clientname.Substring(0,BackSlash0(clientname)) +" bet " + bet.GetNum() + " if the trump is " + bet.GetShape();
+                        bettext.Size = TextRenderer.MeasureText(bettext.Text, bettext.Font);
+                        bettext.Location = new Point(Width / 2 - bettext.Size.Width / 2, 2 * Height / 5);
+                    }));
+                }
+                else
+                {
+                    GetTrump(false);
+                }
+                stream.Read(data, 0, 256);
+                clientname = Encoding.UTF8.GetString(data);
+
             }
-            byte[] data1 = new byte[1];
-            stream.Read(data1, 0, data1.Length);
 
-            char isfrish = Encoding.UTF8.GetString(data1)[0];
+            this.Invoke(new del(() =>
+            {
+                Controls.Remove(bettext);
+            }));
 
-            if (isfrish == 'a')
+            if (clientname[0] != 'a')
             {
                 Frish();
             }
@@ -507,7 +540,7 @@ namespace WhistCilent
         void GetBet()
         {
             choosetrump = new Button[14];
-            for (int i = 0; i < 14; i++)
+            for (int i = 0; i < choosetrump.Length; i++)
             {
                 choosetrump[i] = new Button();
                 choosetrump[i].Size = new Size(Width / 20, Width / 20);
@@ -903,6 +936,17 @@ namespace WhistCilent
                 }
             }
             return false;
+        }
+        int BackSlash0(string mes)
+        {
+            for (int i = 0; i < mes.Length; i++)
+            {
+                if (mes[i] == '\0')
+                {
+                    return i;
+                }
+            }
+            return mes.Length;
         }
         public int ReceiveInt()
         {
