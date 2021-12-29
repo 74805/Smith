@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
-public enum CardEnum : byte { spade, heart, club, diamond };
+public enum CardEnum : byte { spade, heart, club, diamond, withouttrump };
 namespace WhistServer
 {
     [Serializable]

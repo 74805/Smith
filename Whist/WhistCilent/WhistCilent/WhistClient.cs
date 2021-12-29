@@ -194,7 +194,21 @@ namespace WhistCilent
                     {
                         choosetrump[i].Font = new Font("Arial", 7 * Width / 960);
                     }
-                    choosetrump[i].Tag = i; 
+                    if (i == 2)
+                    {
+                        choosetrump[2].Tag = 3;
+                    }else
+                    {
+                        if (i == 3)
+                        {
+                            choosetrump[3].Tag = 2;
+                        }
+                        else
+                        {
+                            choosetrump[i].Tag = i;
+                        }
+                    }
+                    
                     choosetrump[i].Size = choosetrump[0].Image.Size;
                     choosetrump[i].Location = new Point(Width / 2 - 3 * choosetrump[0].Size.Width - Width / 160 + i * (Width / 400 + choosetrump[0].Size.Width), 4 * Height / 7 + choosetrump[0].Image.Size.Height + 5);
                     choosetrump[i].Click += TrumpClick;
@@ -257,7 +271,15 @@ namespace WhistCilent
             else
             {
                 Card card = new Card(1, (CardEnum)(tosend % 10));//to get the name of the shape 
-                bettext.Text = "You bet " + tosend / 10 + " if the trump is " + card.GetShape();
+                if (tosend % 10 == 4)
+                {
+                    bettext.Text = "You bet " + tosend / 10 + " if theere is no trump";
+                }
+                else
+                {
+                    bettext.Text = "You bet " + tosend / 10 + " if the trump is " + card.GetShape();
+                }
+               
             }
             bettext.Size = TextRenderer.MeasureText(bettext.Text, bettext.Font);
             bettext.Location = new Point(Width / 2 - bettext.Size.Width / 2, 2 * Height / 5);
@@ -567,15 +589,23 @@ namespace WhistCilent
                 {
                     Card currenttopbet = ReceiveCard();//when data is received the client needs to make a bet (or pass) or if its a card it means that someone had bet (then the first char of clientsname would be '\0') 
 
+                    CardEnum trump = currenttopbet.GetShape();
                     this.Invoke(new del(() =>
                     {
-                        if (currenttopbet.GetShape() == (CardEnum)5)
+                        if (trump == (CardEnum)5)
                         {
                             bettext.Text = clientname.Substring(0, BackSlash0(clientname)) + " passed";
                         }
                         else
                         {
-                            bettext.Text = clientname.Substring(0, BackSlash0(clientname)) + " bet " + currenttopbet.GetNum() + " if the trump is " + currenttopbet.GetShape();
+                            if (trump == (CardEnum)4)
+                            {
+                                bettext.Text = clientname.Substring(0, BackSlash0(clientname)) + " bet " + currenttopbet.GetNum() + " if theere is no trump";
+                            }
+                            else
+                            {
+                                bettext.Text = clientname.Substring(0, BackSlash0(clientname)) + " bet " + currenttopbet.GetNum() + " if the trump is " + trump;
+                            }
                         }
                         bettext.Size = TextRenderer.MeasureText(bettext.Text, bettext.Font);
                         bettext.Location = new Point(Width / 2 - bettext.Size.Width / 2, 2 * Height / 5);

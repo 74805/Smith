@@ -105,22 +105,16 @@ namespace WhistServer
                 int newtrump = ReceiveInt(i % 4);//5 is pass, 4 is without trump and otherwise its the trump Enum
                 while (newtrump / 10 == 0)
                 {
-                    //if (currenttopbet.GetNum() == 0)
-                    //{
-                    //    SendInt(5, i % 4);//first one to bet
-                    //}
-                    //else
-                    //{
-                        if (newtrump == 4 && currenttopbet.GetShape() != (CardEnum)4) //if its without trump
-                        {
-                            SendInt(currenttopbet.GetNum(), i % 4);
-                        }
-                        else
-                        {
-                            SendInt(MinCardNumPossible((CardEnum)newtrump, frischtimes), i % 4);
-                        }
-                    //}
-                   
+                    
+                    if (newtrump == 4 && currenttopbet.GetShape() != (CardEnum)4) //if its without trump
+                    {
+                        SendInt(currenttopbet.GetNum(), i % 4);
+                    }
+                    else
+                    {
+                        SendInt(MinCardNumPossible((CardEnum)newtrump, frischtimes), i % 4);
+                    }
+                    
                     newtrump = ReceiveInt(i % 4);//Final bet - number*10+trump if he bet and trump=5 if he passed, otherwise last digit is trump and other digits are bet,
                                               //4 is without trump and otherwise its the trump Enum
                 }
@@ -147,7 +141,6 @@ namespace WhistServer
 
         void GetTrump(int frishtimes)
         {
-            frishtimes = 3;
             trump = -1;
             for (int i = betstarterid; i < betstarterid + 4; i++) 
             {
@@ -241,6 +234,11 @@ namespace WhistServer
        
         int MinCardNumPossible(CardEnum trump, int frischtimes)
         {
+            if (currenttopbet.GetShape() == (CardEnum)4)//if its no trump
+            {
+                return currenttopbet.GetNum() + 1;
+            }
+
             Card card = new Card(5, trump);
             for (int i = 5 + frischtimes; i < 14; i++) 
             {
