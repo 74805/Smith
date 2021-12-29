@@ -88,6 +88,8 @@ namespace WhistCilent
 
             cardenable = true;
 
+            othercards = new List<Label>[3];
+
             byte[] data = Encoding.UTF8.GetBytes(Environment.UserName); //save the user name string in bytes array
             stream.Write(data, 0, data.Length); //send the data array
 
@@ -116,7 +118,7 @@ namespace WhistCilent
 
             betting.Start();
 
-            othercards = new List<Label>[3];
+            
             for (int i = 0; i < 3; i++)
             {
                 othercards[i] = new List<Label>();
@@ -789,7 +791,7 @@ namespace WhistCilent
 
             if (winner == 3)//You win yes?
             {
-
+                
                 if (visHand.Count == 0)
                 {
                     this.Invoke(new del(() =>
@@ -1010,11 +1012,6 @@ namespace WhistCilent
 
                     }
 
-                    for (int j = 0; j < 3; j++)
-                    {
-                        Controls.Remove(othercards[j][i]);
-                    }
-
                     if (i < 4)
                     {
 
@@ -1031,6 +1028,8 @@ namespace WhistCilent
                     otherscards.Abort();
 
                 }
+
+                cardenable = true;
 
                 CreateCards("a", new EventArgs());
             }));

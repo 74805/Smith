@@ -20,7 +20,7 @@ namespace WhistServer
         private Card[] thisround;
         private int firstplayer;
         private int betstarterid = 0;
-        private Card currenttopbet = new Card();
+        private Card currenttopbet;
         public Server()
         {
             listener = new TcpListener(IPAddress.Any, 7986);
@@ -141,6 +141,7 @@ namespace WhistServer
 
         void GetTrump(int frishtimes)
         {
+            currenttopbet = new Card();
             trump = -1;
             for (int i = betstarterid; i < betstarterid + 4; i++) 
             {
@@ -346,8 +347,6 @@ namespace WhistServer
         }
         void StartGame()
         {
-            firstplayer = trump % 10;
-            trump = trump / 10; 
 
             for (int j = 0; j < 4; j++)
             {
