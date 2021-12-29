@@ -46,8 +46,8 @@ namespace WhistServer
             }
             for (int i = 0; i < 13; i++)
             {
-                pcards[0][i]=(cards[i]);
-                pcards[1][i]=(cards[i + 13]);
+                pcards[0][i] = (cards[i]);
+                pcards[1][i] = (cards[i + 13]);
                 pcards[2][i] = (cards[i + 26]);
                 pcards[3][i] = (cards[i + 39]);
             }
@@ -55,7 +55,7 @@ namespace WhistServer
             //sorting the cards the players
 
             List<Card>[] list = new List<Card>[4];
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 list[i] = pcards[i].ToList();
                 list[i].Sort();

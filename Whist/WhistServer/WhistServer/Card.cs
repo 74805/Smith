@@ -5,11 +5,11 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
-public enum CardEnum: byte { spade, heart, club ,diamond};
+public enum CardEnum : byte { spade, heart, diamond ,club, withouttrump };
 namespace WhistServer
 {
-    [Serializable] 
-    public class Card: IComparable
+    [Serializable]
+    public class Card : IComparable
     {
         public static int CARD_LENGTH_BYTES = 8;
         private int num;
@@ -106,7 +106,7 @@ namespace WhistServer
                 resultArr[i] = Card.Desserialize(data);
                 if (i != lengthOfArr - 1)
                 {
-                    for (int j = 0; j <data.Length - CARD_LENGTH_BYTES; j++)
+                    for (int j = 0; j < data.Length - CARD_LENGTH_BYTES; j++)
                     {
                         data[j] = data[j + CARD_LENGTH_BYTES];
                     }
@@ -127,18 +127,27 @@ namespace WhistServer
             }
             return result;
         }
-        
+
         public int CompareTo(object obj)
         {
             Card other = obj as Card;
-            if (other == null)
-                return 1;
 
             if (this.GetShape() == other.GetShape())
                 return this.num > other.num ? -1 : 1;
-       
+
             return this.GetShape() > other.GetShape() ? 1 : -1;
-            
+
+        }
+
+        public int CompareToBet(object obj)//used in betting
+        {
+            Card other = obj as Card;
+
+            if (this.GetNum() == other.GetNum())
+                return this.GetShape() < other.GetShape() ? 1 : -1;
+
+            return this.num > other.num ? 1 : -1;
+
         }
     }
 }

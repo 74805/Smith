@@ -93,6 +93,16 @@ namespace WhistCilent.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap _10_old {
+            get {
+                object obj = ResourceManager.GetObject("10_old", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap _100 {
             get {
                 object obj = ResourceManager.GetObject("100", resourceCulture);
@@ -136,6 +146,16 @@ namespace WhistCilent.Properties {
         internal static System.Drawing.Bitmap _11 {
             get {
                 object obj = ResourceManager.GetObject("11", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _11_old {
+            get {
+                object obj = ResourceManager.GetObject("11_old", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -193,6 +213,16 @@ namespace WhistCilent.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap _12_old {
+            get {
+                object obj = ResourceManager.GetObject("12_old", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap _120 {
             get {
                 object obj = ResourceManager.GetObject("120", resourceCulture);
@@ -236,6 +266,16 @@ namespace WhistCilent.Properties {
         internal static System.Drawing.Bitmap _13 {
             get {
                 object obj = ResourceManager.GetObject("13", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _13_old {
+            get {
+                object obj = ResourceManager.GetObject("13_old", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
