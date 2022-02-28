@@ -192,7 +192,7 @@ namespace WhistServer
             byte[] data;
             bool isfrish = false;
             bool newgame = false;
-            if (trump == -1 )//frish
+            if (trump == -1)//frish
             {
                 if (frishtimes == 3)
                 {
@@ -228,6 +228,7 @@ namespace WhistServer
                 }
                 else
                 {
+                    Thread.Sleep(70);
                     GetAndSendBets();
                 }
             }
@@ -326,33 +327,42 @@ namespace WhistServer
        
         void GetAndSendBets()
         {
-            for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
             {
-                clients[i].bet = ReceiveInt(i);
+                SendInt((firstplayer + 4 - j - 1) % 4, j);//send the firstplayer to bet
             }
 
-            byte[] data;
-            for (int i = 0; i < 4; i++)
+            for (int i = firstplayer; i < firstplayer + 4; i++)
             {
-                string bets = "";
-                for (int j = i + 1; j < i + 4; j++)
+                clients[i % 4].bet = ReceiveInt(i % 4);
+                for (int j = i % 4 + 1; j < i % 4 + 4; j++)
                 {
-                    string thisbet = clients[j % 4].bet.ToString();
-                    bets += thisbet.Length.ToString() + thisbet;
+                    SendString(clients[i % 4].bet.ToString(), j % 4);
                 }
-                data = Encoding.UTF8.GetBytes(bets);
-                clients[i].stream.Write(data, 0, data.Length);
             }
+
+            //byte[] data;
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    string bets = "";
+            //    for (int j = i + 1; j < i + 4; j++)
+            //    {
+            //        string thisbet = clients[j % 4].bet.ToString();
+            //        bets += thisbet.Length.ToString() + thisbet;
+            //    }
+            //    data = Encoding.UTF8.GetBytes(bets);
+            //    clients[i].stream.Write(data, 0, data.Length);
+            //}
             StartGame();
         }
         void StartGame()
         {
 
-            for (int j = 0; j < 4; j++)
-            {
-                SendInt((firstplayer + 4 - j - 1) % 4, j);//send the firstplayer when a new round starts
-            }
-
+            //for (int j = 0; j < 4; j++)
+            //{
+            //    SendInt((firstplayer + 4 - j - 1) % 4, j);//send the firstplayer when a new round starts
+            //}
+            
             for (int i = 0; i < 13; i++)//13 rounds of game
             {
                 thisround = new Card[4];
@@ -444,7 +454,6 @@ namespace WhistServer
         }
         bool IsValid(Card card, int clientid)
         {
-
             Card first = thisround[firstplayer];
 
             if (card.GetShape() == first.GetShape())
@@ -521,6 +530,11 @@ namespace WhistServer
 
             Card[] cards = Card.DesserializeArr(data);
             return cards;
+        }
+        void SendString(string tosend, int clientid)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(tosend);
+            clients[clientid].stream.Write(data, 0, data.Length);
         }
         void SendCardArr(Card[] cards, int clientid)
         {

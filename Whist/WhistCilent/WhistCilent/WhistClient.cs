@@ -41,6 +41,7 @@ namespace WhistCilent
         private Label bettext;
         private Button[] betnumbers;
         private Thread betting;
+        private int bet = 0;
         public WhistClient()
         {
             this.FormClosed += (sender, e) => { Environment.Exit(Environment.ExitCode); };
@@ -177,7 +178,7 @@ namespace WhistCilent
                 }
             }
         }
-        void GetTrump()
+        void GetTrump()//this client's turn to make a bet on a trump
         {
             betnumbers = new Button[9];//buttons of the bets
             choosetrump = new Button[6];//buttons of the possible trumps
@@ -251,6 +252,7 @@ namespace WhistCilent
         void SubmitClick(object sender, EventArgs args)
         {
             int tosend = (int)win.Tag;//betnumber*10+trumpnumber
+            bet = tosend / 10;
             if (tosend / 10 == 0)
             {
                 tosend = 10 + tosend;
@@ -522,11 +524,7 @@ namespace WhistCilent
         }
         void PlaceNames()
         {
-            byte[] data = new byte[256];
-
-            stream.Read(data, 0, data.Length);//getting other players' names
-
-            string names = Encoding.UTF8.GetString(data);
+            string names = ReceiveString(256);//getting other players' names
 
             clientid = (int)names[0] - 48;
             names = names.Substring(1);
@@ -579,7 +577,7 @@ namespace WhistCilent
             BeforeGetBet();
         }
 
-        void WaitToBet()
+        void WaitToBet()//deciding on the trump
         {
             byte[] data = new byte[256];
             stream.Read(data, 0, 256);
@@ -607,6 +605,10 @@ namespace WhistCilent
                             else
                             {
                                 bettext.Text = clientname.Substring(0, BackSlash0(clientname)) + " bet " + currenttopbet.GetNum() + " if the trump is " + trump;
+                                if (bet != 0)
+                                {
+                                    bet = 0;
+                                }
                             }
                         }
                         bettext.Size = TextRenderer.MeasureText(bettext.Text, bettext.Font);
@@ -626,10 +628,10 @@ namespace WhistCilent
 
             }
 
-            this.Invoke(new del(() =>
-            {
-                Controls.Remove(bettext);
-            }));
+            //this.Invoke(new del(() =>
+            //{
+            //    Controls.Remove(bettext);
+            //}));
 
             if (clientname[0] == 'b')
             {
@@ -637,7 +639,7 @@ namespace WhistCilent
             }
             else
             {
-                if (clientname[0] == 'a')
+                if (clientname[0] == 'a')//too many frishes
                 {
                     Frish();
                 }
@@ -647,6 +649,7 @@ namespace WhistCilent
                 }
             }
         }
+       
         void BeforeGetBet()
         {
             bettext = new Label();
@@ -661,25 +664,60 @@ namespace WhistCilent
             betting.Start();
         }
 
-        void GetBet()
+        void GetBet()//final betting
         {
-            choosetrump = new Button[14];
-            for (int i = 0; i < choosetrump.Length; i++)
+            currentturn = ReceiveInt();
+            int betsum = 0;
+            string receive;
+            for (int j = 0; j < 4; j++)
             {
-                choosetrump[i] = new Button();
-                choosetrump[i].Size = new Size(Width / 20, Width / 20);
-                choosetrump[i].Text = i.ToString();
-                choosetrump[i].Location = new Point(Width / 2 + (-7 + i) * Width / 20, 3 * Height / 5);
-                choosetrump[i].Click += GotBet;
-
-                this.Invoke(new del(() =>
+                if ((j + currentturn) % 4 == 3)//when its this client's turn to bet
                 {
-                    Controls.Add(choosetrump[i]);
-                }));
+                    choosetrump = new Button[14];
+                    for (int i = 0; i < choosetrump.Length; i++)
+                    {
+                        choosetrump[i] = new Button();
+                        choosetrump[i].Size = new Size(Width / 20, Width / 20);
+                        choosetrump[i].Text = i.ToString();
+                        choosetrump[i].Location = new Point(Width / 2 + (-7 + i) * Width / 20, 3 * Height / 5);
+                        if (i < bet || (i + betsum == 13 && currentturn == 0))
+                        {
+                            choosetrump[i].Enabled = false;
+                        }
+                        else
+                        {
+                            choosetrump[i].Click += GotBet;
+                        }
+
+                        this.Invoke(new del(() =>
+                        {
+                            Controls.Add(choosetrump[i]);
+                        }));
+                    }
+                }
+                else
+                { 
+                    receive = ReceiveString(2);
+                    betsum += int.Parse(receive.Split('\\')[0]);
+                    this.Invoke(new del(() =>
+                    {
+                        bettext.Text = GetName(score[(j + currentturn) % 4].Text) + " bet " + receive;
+                        score[(j + currentturn) % 4].Text += "/" + receive;
+                    }));
+                    
+                }
             }
+
+            this.Invoke(new del(() =>
+            {
+                StartGame();
+            }));
         }
         void StartGame()
         {
+            firstturn = currentturn;
+
+            Controls.Remove(bettext);
             nextound = new Thread(NextRoundThread);
 
             win.Text = "Next Round";
@@ -689,9 +727,6 @@ namespace WhistCilent
             thisturn = new Label();
             thisturn.Font = new Font("Arial", 7 * Width / 960);
             Controls.Add(thisturn);
-
-            firstturn = ReceiveInt();
-            currentturn = firstturn;
 
             foreach (Label label in visHand)
             {
@@ -813,10 +848,6 @@ namespace WhistCilent
                 nextound = new Thread(NextRoundThread);
                 nextound.Start(winner);
             }
-
-
-
-
         }
 
         void ChoseCard(object sender, EventArgs args)
@@ -827,10 +858,7 @@ namespace WhistCilent
 
                 SendCard((Card)card.Tag);
 
-                byte[] data = new byte[1];
-                stream.Read(data, 0, 1);
-
-                if (Encoding.UTF8.GetString(data) == "a")
+                if (ReceiveString(1) == "a")
                 {
                     cardenable = false;
                     NewPosition(card);
@@ -867,10 +895,8 @@ namespace WhistCilent
         }
         void NextRoundThread(object winner)
         {
-            byte[] data = new byte[1];
-            stream.Read(data, 0, 1);
 
-            if (Encoding.UTF8.GetString(data) != "a")
+            if (ReceiveString(1) != "a")
             {
                 this.Invoke(new del(() =>
                 {
@@ -946,24 +972,31 @@ namespace WhistCilent
             }
             choosetrump = null;
 
+            this.Invoke(new del(() =>
+            {
+                bettext.Text = "You bet " + send;
+            }));
+
             SendInt(send);
 
             //getting other's bets
-            byte[] data = new byte[36];
+
+            //string othersbets = ReceiveString(36);
+            //string[] bets = new string[3];
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    int len = (int)othersbets[0] - 48;
+
+            //    bets[i] = othersbets.Substring(1, len);
+            //    score[i].Text += "/" + bets[i];
+            //    othersbets = othersbets.Substring(len + 1);
+            //}
+        }
+        string ReceiveString(int len)
+        {
+            byte[] data = new byte[len];
             stream.Read(data, 0, data.Length);
-
-            string othersbets = Encoding.UTF8.GetString(data);
-            string[] bets = new string[3];
-            for (int i = 0; i < 3; i++)
-            {
-                int len = (int)othersbets[0] - 48;
-
-                bets[i] = othersbets.Substring(1, len);
-                score[i].Text += "/" + bets[i];
-                othersbets = othersbets.Substring(len + 1);
-            }
-
-            StartGame();
+            return Encoding.UTF8.GetString(data);
         }
         Card ReceiveCard()
         {
