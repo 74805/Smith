@@ -61,7 +61,15 @@ namespace WhistServer
                 TcpClient client = listener.AcceptTcpClient();
 
                 byte[] data = new byte[256];
-                client.GetStream().Read(data, 0, data.Length);
+
+                try
+                {
+                    client.GetStream().Read(data, 0, data.Length);
+                }
+                catch
+                {
+
+                }
 
                 string name = Encoding.ASCII.GetString(data);
 
@@ -397,10 +405,18 @@ namespace WhistServer
                     SendInt((firstplayer + 4 - j - 1) % 4, j);//send the winner when a round ends
                 }
 
+
                 if (i < 12)
                 {
                     byte[] data = new byte[1];
-                    clients[firstplayer].stream.Read(data, 0, 1);
+                    try
+                    {
+                        clients[firstplayer].stream.Read(data, 0, 1);
+                    }
+                    catch
+                    {
+
+                    }
 
                     for (int j = firstplayer + 1; j < firstplayer + 4; j++)
                     {
@@ -409,7 +425,15 @@ namespace WhistServer
                 }
             }
             byte[] data1 = new byte[1];
-            clients[firstplayer].stream.Read(data1, 0, 1);
+
+            try
+            {
+                clients[firstplayer].stream.Read(data1, 0, 1);
+            }
+            catch
+            {
+
+            }
 
             for (int i = firstplayer + 1; i < firstplayer + 4; i++)
             {
@@ -472,7 +496,15 @@ namespace WhistServer
         Card RecieveCard(int clientid)
         {
             byte[] data = new byte[8];
-            clients[clientid].stream.Read(data, 0, data.Length);
+            try
+            {
+                clients[clientid].stream.Read(data, 0, data.Length);
+            }
+            catch
+            {
+
+            }
+            
 
             Card card = Card.Desserialize(data);
             return card;

@@ -56,7 +56,7 @@ namespace WhistCilent
                 waitformessages.Abort();
             };
 
-            client = new TcpClient("localhost", 8888);
+            client = new TcpClient("77.139.114.151", 8888);
             stream = client.GetStream();
 
 

@@ -100,7 +100,14 @@ namespace WhistCilent
         void CreateCards(object sender, EventArgs args)
         {
             byte[] data1 = new byte[104];
-            stream.Read(data1, 0, data1.Length); //receive the cards from the server
+            try
+            {
+                stream.Read(data1, 0, data1.Length); //receive the cards from the server
+            }
+            catch
+            {
+                MessageBox.Show("Server is offline");
+            }
 
             Card[] temp = Card.DesserializeArr(data1); //parse the cards that has been Received
             hand = temp.ToList(); //create list of cards from the card array
@@ -474,7 +481,14 @@ namespace WhistCilent
         void IsDoneTakingCards()
         {
             byte[] data = new byte[1];
-            stream.Read(data, 0, data.Length);
+            try
+            {
+                stream.Read(data, 0, data.Length);
+            }
+            catch
+            {
+                MessageBox.Show("Server is offline");
+            }
 
             for (int j = 0; j < 3; j++)
             {
@@ -580,7 +594,16 @@ namespace WhistCilent
         void WaitToBet()//deciding on the trump
         {
             byte[] data = new byte[256];
-            stream.Read(data, 0, 256);
+
+            try
+            {
+                stream.Read(data, 0, 256);
+            }
+            catch
+            {
+                MessageBox.Show("Server is offline");
+            }
+            
             string clientname = Encoding.UTF8.GetString(data);
 
             while (clientname[0] != 'a' && clientname[0] != 'b' && clientname[0] != 'c') //until betting is over
@@ -623,7 +646,16 @@ namespace WhistCilent
                     })); 
                     return;
                 }
-                stream.Read(data, 0, 256);
+
+                try
+                {
+                    stream.Read(data, 0, 256);
+                }
+                catch
+                {
+                    MessageBox.Show("Server is offline");
+                }
+                
                 clientname = Encoding.UTF8.GetString(data);
 
             }
@@ -952,7 +984,15 @@ namespace WhistCilent
         Card[] ReceiveCardArr(int length)
         {
             byte[] data = new byte[8 * length];
-            stream.Read(data, 0, data.Length);
+
+            try
+            {
+                stream.Read(data, 0, data.Length);
+            }
+            catch
+            {
+                MessageBox.Show("Server is offline");
+            }
 
             Card[] cards = Card.DesserializeArr(data);
             return cards;
@@ -995,13 +1035,27 @@ namespace WhistCilent
         string ReceiveString(int len)
         {
             byte[] data = new byte[len];
-            stream.Read(data, 0, data.Length);
+            try
+            {
+                stream.Read(data, 0, data.Length);
+            }
+            catch
+            {
+                MessageBox.Show("Server is offline");
+            }
             return Encoding.UTF8.GetString(data);
         }
         Card ReceiveCard()
         {
             byte[] data = new byte[8];
-            stream.Read(data, 0, data.Length);
+            try
+            {
+                stream.Read(data, 0, data.Length);
+            }
+            catch
+            {
+                MessageBox.Show("Server is offline");
+            }
 
             return Card.Desserialize(data);
         }
@@ -1100,7 +1154,15 @@ namespace WhistCilent
         public int ReceiveInt()
         {
             byte[] buffer = new byte[1];
-            stream.Read(buffer, 0, 1);
+            try
+            {
+                stream.Read(buffer, 0, 1);
+            }
+            catch
+            {
+                MessageBox.Show("Server is offline");
+            }
+            
             return (int)buffer[0];
         }
         private void WhistClient_Load(object sender, EventArgs e)
