@@ -25,8 +25,8 @@ namespace WhistCilent
         private List<Label> messages = new List<Label>();
         public ChatClient()
         {
-            Width = (int)(Screen.PrimaryScreen.WorkingArea.Size.Width / 4.8);
-            Height = (int)(Screen.PrimaryScreen.WorkingArea.Size.Height / 1.87);
+            Width = 400;
+            Height = 556;
             this.MaximumSize = new Size(this.Width, this.Height);
             this.Text = this.GetType().Name;
             text = new TextBox();
