@@ -47,16 +47,24 @@ namespace WhistServer
             }
             else
             {
-                for (int i = 0; i < 4; i++)
+                try
                 {
-                    clients[i].stream.Write(Card.SerializeArr(pcards[i].ToArray()));
+                    for (int i = 0; i < 4; i++)
+                    {
+                        clients[i].stream.Write(Card.SerializeArr(pcards[i].ToArray()));
+                    }
                 }
+                catch
+                {
+
+                }
+               
                 GetTrump(0);
             }
         }
         void WaitForClient()
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)//get clients' names
             {
                 TcpClient client = listener.AcceptTcpClient();
 
@@ -75,15 +83,32 @@ namespace WhistServer
 
                 clients[i] = new Client(name.Substring(0, BackSlash0(name)), client, client.GetStream());
 
-                clients[i].stream.Write(Card.SerializeArr(pcards[i].ToArray()));
+                try
+                {
+                    clients[i].stream.Write(Card.SerializeArr(pcards[i].ToArray()));
+                }
+                catch
+                {
+
+                }
             }
 
-            for (int i = 0; i < 4; i++)//send the names of the other players to a player
+            for (int i = 0; i < 4; i++)//send the names of the other clients to a client
             {
                 string sendnames = i.ToString();
+                int namelengthlen = 0;//the amount of digits of the name's length
+
                 for (int j = i + 1; j < i + 4; j++)
                 {
-                    sendnames += clients[j % 4].name.Length.ToString() + clients[j % 4].name;
+                    int namelen = clients[j % 4].name.Length;
+                    while (namelen != 0)
+                    {
+                        namelengthlen++;
+                        namelen = namelen / 10;
+                    }
+
+                    sendnames += namelengthlen.ToString() + clients[j % 4].name.Length.ToString() + clients[j % 4].name;
+                    namelengthlen = 0;
                 }
                 try
                 {
@@ -102,14 +127,29 @@ namespace WhistServer
             Card card = new Card(1, (CardEnum)(bet % 10));//to get the name of the shape (line 96)
             for (int j = clientid % 4 + 1; j < clientid % 4 + 4; j++)//tell all clients what the client bet
             {
-                currenttopbet = new Card(bet / 10, (CardEnum)(bet % 10)); 
-                clients[j % 4].stream.Write(Encoding.UTF8.GetBytes(clients[clientid].name));
+                currenttopbet = new Card(bet / 10, (CardEnum)(bet % 10));
+                try
+                {
+                    clients[j % 4].stream.Write(Encoding.UTF8.GetBytes(clients[clientid].name));
+                }
+                catch
+                {
+
+                }
                 SendCard(currenttopbet, j % 4);
             }
 
             for (int i = clientid + 1; i < clientid + 4; i++) 
             {
-                clients[i % 4].stream.Write(new byte[] { 0 });//send the client to make a bet on a trump
+                try
+                {
+                    clients[i % 4].stream.Write(new byte[] { 0 });//send the client to make a bet on a trump
+                }
+                catch
+                {
+
+                }
+                
                 int newtrump = ReceiveInt(i % 4);//5 is pass, 4 is without trump and otherwise its the trump Enum
                 while (newtrump / 10 == 0)
                 {
@@ -138,7 +178,15 @@ namespace WhistServer
 
                     for (int j = i % 4 + 1; j < i % 4 + 4; j++)//tell all clients that the client passed
                     {
-                        clients[j % 4].stream.Write(Encoding.UTF8.GetBytes(clients[i % 4].name));
+                        try
+                        {
+                            clients[j % 4].stream.Write(Encoding.UTF8.GetBytes(clients[i % 4].name));
+                        }
+                        catch
+                        {
+
+                        }
+                        
                         SendCard(card1, j % 4);
                     }
                 }
@@ -153,7 +201,14 @@ namespace WhistServer
             trump = -1;
             for (int i = betstarterid; i < betstarterid + 4; i++) 
             {
-                clients[i % 4].stream.Write(new byte[] { 0 });//send the client to make a bet on a trump
+                try
+                {
+                    clients[i % 4].stream.Write(new byte[] { 0 });//send the client to make a bet on a trump
+                }
+                catch
+                {
+
+                }
 
                 int trump = ReceiveInt(i % 4);//5 is pass, 4 is without trump and otherwise its the trump Enum
                 while (trump / 10 == 0)
@@ -191,7 +246,14 @@ namespace WhistServer
 
                     for (int j = i % 4 + 1; j < i % 4 + 4; j++)//tell all clients that the client passed
                     {
-                        clients[j % 4].stream.Write(Encoding.UTF8.GetBytes(clients[i % 4].name));
+                        try
+                        {
+                            clients[j % 4].stream.Write(Encoding.UTF8.GetBytes(clients[i % 4].name));
+                        }
+                        catch
+                        {
+
+                        }
                         SendCard(card, j % 4);
                     }
                 }
@@ -218,10 +280,18 @@ namespace WhistServer
             {
                 data = Encoding.UTF8.GetBytes("b");//tell all clients to bet
             }
-            for (int i = 0; i < 4; i++)
+            try
             {
-                clients[i].stream.Write(data, 0, data.Length);
+                for (int i = 0; i < 4; i++)
+                {
+                    clients[i].stream.Write(data, 0, data.Length);
+                }
             }
+            catch
+            {
+
+            }
+           
             if (isfrish)
             {
                 GetFrishCards();
@@ -229,14 +299,13 @@ namespace WhistServer
             }
             else
             {
+                Thread.Sleep(150);
                 if (newgame) 
                 {
-                    Thread.Sleep(70);
                     StartServer(false);//New Game
                 }
                 else
                 {
-                    Thread.Sleep(70);
                     GetAndSendBets();
                 }
             }
@@ -298,10 +367,18 @@ namespace WhistServer
             {
                 areallplayersdone = !(pcards[0].Count == 13 && pcards[1].Count == 13 && pcards[2].Count == 13 && pcards[3].Count == 13); 
             }
-            for (int i = 0; i < 4; i++)
+            try
             {
-                clients[i].stream.Write(new byte[] { 0 });
+                for (int i = 0; i < 4; i++)
+                {
+                    clients[i].stream.Write(new byte[] { 0 });
+                }
             }
+            catch
+            {
+
+            }
+            
             threads = null;
         }
         void SendIndex(object clientid)
@@ -328,9 +405,16 @@ namespace WhistServer
             }
         }
 
-        public void SendInt(int num,int clientid)
+        public void SendInt(int num, int clientid)
         {
-            clients[clientid].stream.Write(new byte[1] { (byte)num }, 0, 1);
+            try
+            {
+                clients[clientid].stream.Write(new byte[1] { (byte)num }, 0, 1);
+            }
+            catch
+            {
+
+            }
         }
        
         void GetAndSendBets()
@@ -384,12 +468,26 @@ namespace WhistServer
                         if (IsValid(thisround[j % 4], j % 4))
                         {
                             RemoveCard(thisround[j % 4], j % 4);
-                            clients[j % 4].stream.Write(Encoding.UTF8.GetBytes("a"));
+                            try
+                            {
+                                clients[j % 4].stream.Write(Encoding.UTF8.GetBytes("a"));
+                            }
+                            catch
+                            {
+
+                            }
                             break;
                         }
                         else
                         {
-                            clients[j % 4].stream.Write(Encoding.UTF8.GetBytes("b"));
+                            try
+                            {
+                                clients[j % 4].stream.Write(Encoding.UTF8.GetBytes("b"));
+                            }
+                            catch
+                            {
+
+                            }
                         }
                     }
 
@@ -412,15 +510,14 @@ namespace WhistServer
                     try
                     {
                         clients[firstplayer].stream.Read(data, 0, 1);
+                        for (int j = firstplayer + 1; j < firstplayer + 4; j++)
+                        {
+                            clients[j % 4].stream.Write(new byte[] { 0 }, 0, 1);
+                        }
                     }
                     catch
                     {
 
-                    }
-
-                    for (int j = firstplayer + 1; j < firstplayer + 4; j++)
-                    {
-                        clients[j % 4].stream.Write(new byte[] { 0 }, 0, 1);
                     }
                 }
             }
@@ -429,15 +526,14 @@ namespace WhistServer
             try
             {
                 clients[firstplayer].stream.Read(data1, 0, 1);
+                for (int i = firstplayer + 1; i < firstplayer + 4; i++)
+                {
+                    clients[i % 4].stream.Write(Encoding.UTF8.GetBytes("a"), 0, 1);
+                }
             }
             catch
             {
 
-            }
-
-            for (int i = firstplayer + 1; i < firstplayer + 4; i++)
-            {
-                clients[i % 4].stream.Write(Encoding.UTF8.GetBytes("a"),0,1);
             }
 
             StartServer(false);//New Game
@@ -545,7 +641,14 @@ namespace WhistServer
         void SendCard(Card card,int clientid)
         {
             byte[] data = Card.Serialize(card);
-            clients[clientid].stream.Write(data);
+            try
+            {
+                clients[clientid].stream.Write(data);
+            }
+            catch
+            {
+
+            }
         }
     
         Card[] RecieveCardArr(int length, int clientid)
@@ -566,12 +669,27 @@ namespace WhistServer
         void SendString(string tosend, int clientid)
         {
             byte[] data = Encoding.UTF8.GetBytes(tosend);
-            clients[clientid].stream.Write(data, 0, data.Length);
+            try
+            {
+                clients[clientid].stream.Write(data, 0, data.Length);
+            }
+            catch
+            {
+
+            }
         }
         void SendCardArr(Card[] cards, int clientid)
         {
             byte[] data = Card.SerializeArr(cards);
-            clients[clientid].stream.Write(data);
+            try
+            {
+                clients[clientid].stream.Write(data);
+            }
+            catch
+            {
+
+            }
+            
         }
     }
 }

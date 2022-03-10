@@ -38,7 +38,7 @@ namespace WhistCilent
         private Thread nextound;
         private bool cardenable;
         private ChatClient chatclient = null;
-        private Label bettext;
+        private Label centertext;
         private Button[] betnumbers;
         private Thread betting;
         private int bet = 0;
@@ -61,20 +61,20 @@ namespace WhistCilent
             {
                 try
                 {
-                    chatclient.BringToFront();//if the chat was opened and its closed now
+                    chatclient.BringToFront();//if the chat was open and its closed now
                     chatclient.Show();
                 }
                 catch
                 {
                     try
-                    {
+                    {//if the chat was never open
                         chatclient = new ChatClient();
                         chatclient.Show();
                         chatclient.BringToFront();
                     }
                     catch
                     {
-                        MessageBox.Show("Chat server does not currently work");
+                        MessageBox.Show("Chat server is offline");
                         if (chatclient != null)
                         {
                             chatclient.Close();
@@ -92,7 +92,7 @@ namespace WhistCilent
             othercards = new List<Label>[3];
 
             byte[] data = Encoding.UTF8.GetBytes(Environment.UserName); //save the user name string in bytes array
-            stream.Write(data, 0, data.Length); //send the data array
+            stream.Write(data, 0, data.Length); //send the name to the server
 
             Shown += CreateCards;//creating a visual form of the cards
         }
@@ -115,7 +115,7 @@ namespace WhistCilent
 
             try
             {
-                string a = (string)sender;//if sender is null then the form was just shown
+                string a = (string)sender;//if sender is null then it is the first game
                 betting = new Thread(BeforeGetBet);
             }
             catch
@@ -277,30 +277,32 @@ namespace WhistCilent
             }
             if (tosend % 10 == 5)
             {
-                bettext.Text = "You passed";
+                ChangeCenterText("You passed");
             }
             else
             {
                 Card card = new Card(1, (CardEnum)(tosend % 10));//to get the name of the shape 
                 if (tosend % 10 == 4)
                 {
-                    bettext.Text = "You bet " + tosend / 10 + " if theere is no trump";
+                    ChangeCenterText("You bet " + tosend / 10 + " if theere is no trump");
                 }
                 else
                 {
-                    bettext.Text = "You bet " + tosend / 10 + " if the trump is " + card.GetShape();
+                    ChangeCenterText("You bet " + tosend / 10 + " if the trump is " + card.GetShape());
                 }
-               
             }
-            bettext.Size = TextRenderer.MeasureText(bettext.Text, bettext.Font);
-            bettext.Location = new Point(Width / 2 - bettext.Size.Width / 2, 2 * Height / 5);
 
             win.Hide();
 
             betting = new Thread(WaitToBet);
             betting.Start();
         }
-
+        void ChangeCenterText(string text)
+        {
+            centertext.Text = text;
+            centertext.Size = TextRenderer.MeasureText(centertext.Text, centertext.Font);
+            centertext.Location = new Point(Width / 2 - centertext.Size.Width / 2, 2 * Height / 5);
+        }
         void TrumpClick(object sender, EventArgs args)
         {
             Button trump = (Button)sender;
@@ -503,6 +505,7 @@ namespace WhistCilent
             }
             frishcards = null;
 
+            centertext.Text = "";
             WaitToBet();
         }
         void PlaceFrishCards(object sender, EventArgs args)
@@ -547,17 +550,19 @@ namespace WhistCilent
             for (int i = 0; i < 3; i++)
             {
                 string temp = "";
-                int namelen;
-                try
-                {
-                    namelen = int.Parse(names.Substring(0, 2));
-                    names = names.Substring(2);
-                }
-                catch
-                {
-                    namelen = (int)names[1] - 48;
-                    names = names.Substring(1);
-                }
+                int namelenlen = (int)names[0] - 48;
+                int namelen = int.Parse(names.Substring(1, namelenlen));
+                names = names.Substring(1 + namelenlen);
+                //try
+                //{
+                //    namelen = int.Parse(names.Substring(0, 2));
+                //    names = names.Substring(2);
+                //}
+                //catch
+                //{
+                //    namelen = (int)names[1] - 48;
+                //    names = names.Substring(1);
+                //}
 
                 for (int j = 0; j < namelen; j++)
                 {
@@ -617,25 +622,23 @@ namespace WhistCilent
                     {
                         if (trump == (CardEnum)5)
                         {
-                            bettext.Text = clientname.Substring(0, BackSlash0(clientname)) + " passed";
+                            ChangeCenterText(clientname.Substring(0, BackSlash0(clientname)) + " passed");
                         }
                         else
                         {
                             if (trump == (CardEnum)4)
                             {
-                                bettext.Text = clientname.Substring(0, BackSlash0(clientname)) + " bet " + currenttopbet.GetNum() + " if theere is no trump";
+                                ChangeCenterText(clientname.Substring(0, BackSlash0(clientname)) + " bet " + currenttopbet.GetNum() + " if theere is no trump");
                             }
                             else
                             {
-                                bettext.Text = clientname.Substring(0, BackSlash0(clientname)) + " bet " + currenttopbet.GetNum() + " if the trump is " + trump;
+                                ChangeCenterText(clientname.Substring(0, BackSlash0(clientname)) + " bet " + currenttopbet.GetNum() + " if the trump is " + trump);
                                 if (bet != 0)
                                 {
                                     bet = 0;
                                 }
                             }
                         }
-                        bettext.Size = TextRenderer.MeasureText(bettext.Text, bettext.Font);
-                        bettext.Location = new Point(Width / 2 - bettext.Size.Width / 2, 2 * Height / 5);
                     }));
                 }
                 else
@@ -660,19 +663,15 @@ namespace WhistCilent
 
             }
 
-            //this.Invoke(new del(() =>
-            //{
-            //    Controls.Remove(bettext);
-            //}));
-
             if (clientname[0] == 'b')
             {
                 GetBet();
             }
             else
             {
-                if (clientname[0] == 'a')//too many frishes
+                if (clientname[0] == 'a')//not too many frishes
                 {
+                    ChangeCenterText("Its frisch!");
                     Frish();
                 }
                 else//start the game over
@@ -684,12 +683,12 @@ namespace WhistCilent
        
         void BeforeGetBet()
         {
-            bettext = new Label();
-            bettext.Font = new Font("Arial", 7 * Width / 960);
-            bettext.Text = "";
+            centertext = new Label();
+            centertext.Font = new Font("Arial", 7 * Width / 960);
+            centertext.Text = "";
             this.Invoke(new del(() =>
             {
-                Controls.Add(bettext);
+                Controls.Add(centertext);
             }));
 
             betting = new Thread(WaitToBet);
@@ -733,7 +732,7 @@ namespace WhistCilent
                     betsum += int.Parse(receive.Split('\\')[0]);
                     this.Invoke(new del(() =>
                     {
-                        bettext.Text = GetName(score[(j + currentturn) % 4].Text) + " bet " + receive;
+                        ChangeCenterText(GetName(score[(j + currentturn) % 4].Text) + " bet " + receive);
                         score[(j + currentturn) % 4].Text += "/" + receive;
                     }));
                     
@@ -749,7 +748,7 @@ namespace WhistCilent
         {
             firstturn = currentturn;
 
-            Controls.Remove(bettext);
+            Controls.Remove(centertext);
             nextound = new Thread(NextRoundThread);
 
             win.Text = "Next Round";
@@ -1014,23 +1013,10 @@ namespace WhistCilent
 
             this.Invoke(new del(() =>
             {
-                bettext.Text = "You bet " + send;
+                ChangeCenterText("You bet " + send);
             }));
 
             SendInt(send);
-
-            //getting other's bets
-
-            //string othersbets = ReceiveString(36);
-            //string[] bets = new string[3];
-            //for (int i = 0; i < 3; i++)
-            //{
-            //    int len = (int)othersbets[0] - 48;
-
-            //    bets[i] = othersbets.Substring(1, len);
-            //    score[i].Text += "/" + bets[i];
-            //    othersbets = othersbets.Substring(len + 1);
-            //}
         }
         string ReceiveString(int len)
         {
@@ -1117,7 +1103,7 @@ namespace WhistCilent
                 }
 
                 cardenable = true;
-
+                centertext.Text = "";
                 CreateCards("a", new EventArgs());
             }));
 
